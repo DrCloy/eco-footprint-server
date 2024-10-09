@@ -11,3 +11,8 @@ class AuthInput:
 class AuthOutput:
     token: str
     expired: int
+
+
+@dataclass
+class UserData:
+    username: str
