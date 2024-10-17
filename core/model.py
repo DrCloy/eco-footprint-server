@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Union, Optional
 
 
 class UserData(BaseModel):
@@ -19,3 +20,4 @@ class CampainData(BaseModel):
     id: str
     name: str
     description: str
+    participants: Union[list[UserData], list[str]]
