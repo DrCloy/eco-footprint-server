@@ -1,18 +1,21 @@
-from dataclasses import dataclass, field
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class AuthInput:
+class UserData(BaseModel):
+    id: str
     username: str
-    password: str
+    point: int = Field(..., ge=0)
+    thumbnailURL: str
 
 
-@dataclass
-class AuthOutput:
-    token: str
-    expired: int
+class DonationData(BaseModel):
+    id: str
+    name: str
+    amount: int = Field(..., ge=0)
+    description: str
 
 
-@dataclass
-class UserData:
-    username: str
+class CampainData(BaseModel):
+    id: str
+    name: str
+    description: str

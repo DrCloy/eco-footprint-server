@@ -2,7 +2,9 @@ from typing import *
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+from routers.userRouter import userRouter
+
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -13,11 +15,5 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+########## Add routers ##########
+app.include_router(userRouter, prefix="/user", tags=["user"])
