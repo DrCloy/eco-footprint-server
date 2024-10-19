@@ -14,11 +14,10 @@ from routers.donationRouter import create_donation_router
 user_repo: UserRepository = UserTestRepo()
 donation_repo: DonationRepository = DonationTestRepo()
 
-
 user_router = create_user_router(user_repo)
 donation_router = create_donation_router(donation_repo)
 
-
+########## FastAPI App ##########
 app = FastAPI(root_path="/api", title="Eco-Footprint API", version="0.1")
 
 app.add_middleware(
