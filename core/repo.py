@@ -17,6 +17,10 @@ class DonationRepository(ABC):
     def get_donation(self, donation_id: int) -> DonationData:
         pass
 
+    @abstractmethod
+    def create_donation(self, donation: DonationData) -> DonationData:
+        pass
+
 
 class CampainRepository(ABC):
     @abstractmethod
