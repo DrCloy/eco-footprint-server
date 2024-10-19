@@ -2,9 +2,24 @@ from typing import *
 from fastapi import FastAPI, responses, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers.userRouter import userRouter
+from core.repo import UserRepository, DonationRepository
 
-app = FastAPI(root_path="/api")
+from repo.user_test import UserTestRepo
+from repo.donation_test import DonationTestRepo
+
+from routers.userRouter import create_user_router
+from routers.donationRouter import create_donation_router
+
+########## Dependency Injection ##########
+user_repo: UserRepository = UserTestRepo()
+donation_repo: DonationRepository = DonationTestRepo()
+
+
+user_router = create_user_router(user_repo)
+donation_router = create_donation_router(donation_repo)
+
+
+app = FastAPI(root_path="/api", title="Eco-Footprint API", version="0.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,4 +41,5 @@ def http_exception_handler(request, exc):
 
 
 ########## Add routers ##########
-app.include_router(userRouter, prefix="/user", tags=["user"])
+app.include_router(user_router)
+app.include_router(donation_router)
