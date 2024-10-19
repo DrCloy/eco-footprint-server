@@ -14,4 +14,8 @@ def create_donation_router(repo: DonationRepository):
     def get_donation(donation_id: int):
         return repo.get_donation(donation_id)
 
+    @router.post("/create")
+    def create_donation(donation: DonationData):
+        return repo.create_donation(donation)
+
     return router
