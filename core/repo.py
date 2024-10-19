@@ -4,7 +4,7 @@ from core.model import UserData, DonationData, CampainData
 
 class UserRepository(ABC):
     @abstractmethod
-    def get_user(self, user_id: int) -> UserData:
+    def get_user(self, user_id: str) -> UserData:
         pass
 
 

@@ -10,14 +10,14 @@ class UserData(BaseModel):
 
 
 class DonationData(BaseModel):
-    id: str
+    id: int
     name: str
     amount: int = Field(..., ge=0)
     description: str
 
 
 class CampainData(BaseModel):
-    id: str
+    id: int
     name: str
     description: str
     participants: Union[list[UserData], list[str]]
