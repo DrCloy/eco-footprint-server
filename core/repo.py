@@ -10,6 +10,10 @@ class UserRepository(ABC):
 
 class DonationRepository(ABC):
     @abstractmethod
+    def get_all_donations(self) -> list[DonationData]:
+        pass
+
+    @abstractmethod
     def get_donation(self, donation_id: int) -> DonationData:
         pass
 
