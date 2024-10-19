@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 from core.repo import UserRepository
-from repo.user_test import UserTestRepo
-
-userRouter = APIRouter()
-
-userRepo: UserRepository = UserTestRepo()
 
 
-userRouter.add_api_route('/{user_id}', userRepo.get_user, methods=['GET'])
+def create_user_router(repo: UserRepository):
+    router = APIRouter(prefix="/user", tags=["User"])
+
+    @router.get("/{user_id}")
+    def get_user(user_id: str):
+        return repo.get_user(user_id)
+
+    return router
