@@ -32,14 +32,11 @@ class User4(UserData):
 
 
 class UserTestRepo(UserRepository):
+    def __init__(self):
+        self.user = [User1(), User2(), User3(), User4()]
+
     def get_user(self, user_id: str) -> UserData:
-        if user_id == "1":
-            return User1()
-        elif user_id == "2":
-            return User2()
-        elif user_id == "3":
-            return User3()
-        elif user_id == "4":
-            return User4()
-        else:
-            raise HTTPException(status_code=404, detail="User not found")
+        for u in self.user:
+            if u.id == user_id:
+                return u
+        raise HTTPException(status_code=404, detail="User not found")
