@@ -1,0 +1,19 @@
+{
+    "name": "eco-footprint-server-dev",
+    "dockerComposeFile": ["./docker-compose.yml"],
+    "service": "eco-footprint",
+    "shutdownAction": "none",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.autopep",
+                "esbenp.prettier-vscode",
+                "GitHub.copilot",
+                "mhutchie.git-graph"
+            ]
+        }
+    },
+    "workspaceFolder": "/workspace"
+  }
+  
