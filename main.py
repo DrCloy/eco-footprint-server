@@ -1,5 +1,5 @@
 from typing import *
-from fastapi import FastAPI, responses, HTTPException
+from fastapi import FastAPI, responses, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.repo import UserRepository, DonationRepository
@@ -18,7 +18,7 @@ user_router = create_user_router(user_repo)
 donation_router = create_donation_router(donation_repo)
 
 ########## FastAPI App ##########
-app = FastAPI(root_path="/api", title="Eco-Footprint API", version="0.1")
+app = FastAPI(title="Eco-Footprint API", version="0.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,5 +40,8 @@ def http_exception_handler(request, exc):
 
 
 ########## Add routers ##########
-app.include_router(user_router)
-app.include_router(donation_router)
+app_router =  APIRouter(prefix="/api")
+app_router.include_router(user_router)
+app_router.include_router(donation_router)
+
+app.include_router(app_router)
