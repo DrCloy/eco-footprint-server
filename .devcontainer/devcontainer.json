@@ -12,8 +12,7 @@
       "moby": "true"
     },
     "ghcr.io/devcontainers/features/python:1": {
-      "installPackages": ["python3-pip", "fastapi", "fastapi[standard]", "uvicorn", "python-dotenv", "requests"],
-      "pythonVersion": "3.12"
+      "version": "3.12"
     },
     "ghcr.io/devcontainers-extra/features/apt-get-packages:1": {}
   },
@@ -22,7 +21,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "docker --version",
+  // "postCreateCommand": "pip install -r requirements.txt && pip install pipreqs && ../dev/dbCheck.sh",
 
   // Configure tool-specific properties.
   "customizations": {
