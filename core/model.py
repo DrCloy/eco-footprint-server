@@ -6,7 +6,7 @@ class UserData(BaseModel):
     id: str
     username: str
     point: int = Field(..., ge=0)
-    thumbnailURL: str
+    thumbnailURL: Optional[str] = None
 
 
 class DonationData(BaseModel):
