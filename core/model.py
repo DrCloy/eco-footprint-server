@@ -6,18 +6,22 @@ class UserData(BaseModel):
     id: str
     username: str
     point: int = Field(..., ge=0)
+    giftIds: list[str] = []
+    DonationIds: list[str] = []
+    campainIds: list[str] = []
     thumbnailURL: Optional[str] = None
 
 
 class DonationData(BaseModel):
-    id: int
+    id: str
     name: str
-    amount: int = Field(..., ge=0)
+    totalPoint: int = Field(..., ge=0)
+    participants: Union[list[UserData], list[str]]
     description: str
 
 
 class CampainData(BaseModel):
-    id: int
+    id: str
     name: str
     description: str
     participants: Union[list[UserData], list[str]]
