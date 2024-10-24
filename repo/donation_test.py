@@ -36,14 +36,14 @@ class DonationTestRepo(DonationRepository):
     def __init__(self):
         self.donations = [Donation1(), Donation2(), Donation3(), Donation4()]
 
-    def get_all_donations(self) -> list[DonationData]:
+    def getAllDonations(self) -> list[DonationData]:
         return self.donations
 
-    def get_donation(self, donation_id: int) -> DonationData:
+    def getDonation(self, donation_id: int) -> DonationData:
         for donation in self.donations:
             if donation.id == donation_id:
                 return donation
         raise HTTPException(status_code=404, detail="Donation not found")
 
-    def create_donation(self, donation: DonationData) -> DonationData:
+    def createDonation(self, donation: DonationData) -> DonationData:
         self.donations.append(donation)

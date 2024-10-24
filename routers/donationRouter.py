@@ -8,14 +8,14 @@ def create_donation_router(repo: DonationRepository):
 
     @router.get("/")
     def get_all_donations():
-        return repo.get_all_donations()
+        return repo.getAllDonations()
 
     @router.get("/{donation_id}")
-    def get_donation(donation_id: int):
-        return repo.get_donation(donation_id)
+    def get_donation(donationId: int):
+        return repo.getDonation(donationId)
 
     @router.post("/create")
     def create_donation(donation: DonationData):
-        return repo.create_donation(donation)
+        return repo.createDonation(donation)
 
     return router
