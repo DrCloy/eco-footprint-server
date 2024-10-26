@@ -2,20 +2,24 @@ from typing import *
 from fastapi import FastAPI, responses, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.repo import UserRepository, DonationRepository
+import pymongo
 
-from repo.user_test import UserTestRepo
+from core.repo import UserRepository
+
+from repo.user_mongo import UserMongoRepo
 from repo.donation_test import DonationTestRepo
 
 from routers.userRouter import create_user_router
 from routers.donationRouter import create_donation_router
 
+########## MongoDB Connection ##########
+client = pymongo.MongoClient(host="localhost", port=27017, username="admin", password="admin")
+db = client.test
+
 ########## Dependency Injection ##########
-user_repo: UserRepository = UserTestRepo()
-donation_repo: DonationRepository = DonationTestRepo()
+user_repo: UserRepository = UserMongoRepo(db)
 
 user_router = create_user_router(user_repo)
-donation_router = create_donation_router(donation_repo)
 
 ########## FastAPI App ##########
 app = FastAPI(title="Eco-Footprint API", version="0.1")
@@ -40,8 +44,7 @@ def http_exception_handler(request, exc):
 
 
 ########## Add routers ##########
-app_router =  APIRouter(prefix="/api")
+app_router = APIRouter(prefix="/api")
 app_router.include_router(user_router)
-app_router.include_router(donation_router)
 
 app.include_router(app_router)
