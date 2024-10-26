@@ -1,18 +1,22 @@
 from fastapi import APIRouter
+from pymongo.database import Database
 
 from core.model import UserData
 from core.repo import UserRepository
 
 
-def create_user_router(repo: UserRepository):
-    router = APIRouter(prefix="/user", tags=["User"])
+class UserRouter(APIRouter):
+    def __init__(self, db: Database, repo: UserRepository):
+        super().__init__(prefix="/user", tags=["User"])
+        self.db = db
+        self.collection = self.db.users
+        self.repo = repo
 
-    @router.get("/{userId}")
-    def get_user(userId: str):
-        return repo.getUserInfo(userId)
+        self.add_api_route("/register", self.register_user, methods=["POST"])
+        self.add_api_route("/{userId}", self.get_user, methods=["GET"])
 
-    @router.post("/register")
-    def register_user(user: UserData):
-        return repo.createUser(user)
+    def get_user(self, userId: str):
+        return self.repo.getUserInfo(userId)
 
-    return router
+    def register_user(self, user: UserData):
+        return self.repo.createUser(user)

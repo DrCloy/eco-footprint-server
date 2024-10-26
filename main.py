@@ -9,7 +9,7 @@ from core.repo import UserRepository
 from repo.user_mongo import UserMongoRepo
 from repo.donation_test import DonationTestRepo
 
-from router.userRouter import create_user_router
+from router.userRouter import UserRouter
 from router.donationRouter import create_donation_router
 
 ########## MongoDB Connection ##########
@@ -19,7 +19,7 @@ db = client.test
 ########## Dependency Injection ##########
 user_repo: UserRepository = UserMongoRepo(db)
 
-user_router = create_user_router(user_repo)
+user_router = UserRouter(db, user_repo)
 
 ########## FastAPI App ##########
 app = FastAPI(title="Eco-Footprint API", version="0.1")
