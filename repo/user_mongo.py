@@ -1,14 +1,15 @@
 import pymongo
 
 from fastapi import HTTPException
-import pymongo.database
+
+from pymongo.database import Database
 
 from core.model import UserData
 from core.repo import UserRepository
 
 
 class UserMongoRepo(UserRepository):
-    def __init__(self, db: pymongo.database.Database):
+    def __init__(self, db: Database):
         super().__init__()
         self.db = db
         self.collection = self.db.users
@@ -23,5 +24,12 @@ class UserMongoRepo(UserRepository):
         if self.collection.find_one({"id": user.id}):
             raise HTTPException(status_code=400, detail="User already exists")
         self.collection.insert_one(user.model_dump())
+
+        return self.getUserInfo(user.id)
+
+    def updateUser(self, user: UserData) -> UserData:
+        if not self.collection.find_one({"id": user.id}):
+            raise HTTPException(status_code=404, detail="User not found")
+        self.collection.update_one({"id": user.id}, {"$set": user.model_dump()})
 
         return self.getUserInfo(user.id)
