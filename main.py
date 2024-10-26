@@ -9,8 +9,8 @@ from core.repo import UserRepository
 from repo.user_mongo import UserMongoRepo
 from repo.donation_test import DonationTestRepo
 
-from routers.userRouter import create_user_router
-from routers.donationRouter import create_donation_router
+from router.userRouter import create_user_router
+from router.donationRouter import create_donation_router
 
 ########## MongoDB Connection ##########
 client = pymongo.MongoClient(host="localhost", port=27017, username="admin", password="admin")
