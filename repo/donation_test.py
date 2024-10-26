@@ -5,30 +5,34 @@ from core.repo import DonationRepository
 
 
 class Donation1(DonationData):
-    id: int = 1
+    id: int = "1"
     name: str = "donation1"
-    amount: int = 100
+    totalPoint: int = 100
+    participants: list[str] = []
     description: str = "Thank you for your donation"
 
 
 class Donation2(DonationData):
-    id: int = 2
+    id: int = "2"
     name: str = "donation2"
-    amount: int = 200
+    totalPoint: int = 200
+    participants: list[str] = []
     description: str = "Thank you for your donation"
 
 
 class Donation3(DonationData):
-    id: int = 3
+    id: int = "3"
     name: str = "donation3"
-    amount: int = 300
+    totalPoint: int = 300
+    participants: list[str] = []
     description: str = "Thank you for your donation"
 
 
 class Donation4(DonationData):
-    id: int = 4
+    id: int = "4"
     name: str = "donation4"
-    amount: int = 400
+    totalPoint: int = 400
+    participants: list[str] = []
     description: str = "Thank you for your donation"
 
 
