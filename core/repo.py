@@ -7,6 +7,14 @@ class UserRepository(ABC):
     def getUserInfo(self, userId: str) -> UserData:
         pass
 
+    @abstractmethod
+    def createUser(self, user: UserData) -> UserData:
+        pass
+
+    @abstractmethod
+    def updateUser(self, user: UserData) -> UserData:
+        pass
+
 
 class DonationRepository(ABC):
     @abstractmethod
