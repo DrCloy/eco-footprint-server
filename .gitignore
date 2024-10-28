@@ -7,3 +7,5 @@ db/*
 dev/*
 
 *.sh
+
+TODO.md
