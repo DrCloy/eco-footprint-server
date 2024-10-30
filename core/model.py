@@ -17,7 +17,7 @@ class UserItemMeta(BaseModel):
     thumbnailId: Optional[str] = None
 
 
-class DonationItmeMeta(BaseModel):
+class DonationItemMeta(BaseModel):
     id: Optional[str] = None
     name: str
     currentPoint: int = Field(..., ge=0)
@@ -64,7 +64,7 @@ class UserItem(UserItemMeta):
     thumbnailId: str = ''
 
 
-class DonationItem(DonationItmeMeta):
+class DonationItem(DonationItemMeta):
     id: str
     name: str
     currentPoint: int = Field(..., ge=0)
