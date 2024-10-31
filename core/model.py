@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import Union, Optional
+from enum import Enum
 
 
-class ItemState(enumerate):
+class ItemState(Enum):
     UNDEFINED = -1
     PENDING = 0
     ACTIVE = 1
