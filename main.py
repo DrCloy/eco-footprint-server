@@ -1,8 +1,12 @@
+# Import libraries and modules
 from typing import *
 from fastapi import FastAPI, responses, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
+import os
 import pymongo
+
+from dotenv import load_dotenv
 
 from core.repo import UserRepository
 
@@ -12,9 +16,18 @@ from repo.donation_test import DonationTestRepo
 from router.userRouter import UserRouter
 from router.donationRouter import create_donation_router
 
+# Load environment variables
+load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
+
+MONGO_HOST = os.getenv("MONGO_HOST")
+MONGO_PORT = os.getenv("MONGO_PORT")
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+MONGO_DB = os.getenv("MONGO_DB")
+
 ########## MongoDB Connection ##########
-client = pymongo.MongoClient(host="localhost", port=27017, username="admin", password="admin")
-db = client.test
+client = pymongo.MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASSWORD)
+db = client[MONGO_DB]
 
 ########## Dependency Injection ##########
 user_repo: UserRepository = UserMongoRepo(db)
