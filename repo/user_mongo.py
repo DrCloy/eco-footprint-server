@@ -4,32 +4,41 @@ from fastapi import HTTPException
 
 from pymongo.database import Database
 
-from core.model import UserData
+from core.model import UserItem
 from core.repo import UserRepository
 
 
 class UserMongoRepo(UserRepository):
     def __init__(self, db: Database):
         super().__init__()
-        self.db = db
-        self.collection = self.db.users
+        self._db = db
+        self._collection = db["users"]
 
-    def getUserInfo(self, userId: str) -> UserData:
-        user = self.collection.find_one({"id": userId})
+    def createUser(self, userItem: UserItem) -> UserItem:
+        self._collection.insert_one(userItem.model_dump())
+
+        user = self._collection.find_one({"id": userItem.id})
         if user:
-            return UserData(**user)
-        raise HTTPException(status_code=404, detail="User not found")
+            return UserItem(**user)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to create user")
 
-    def createUser(self, user: UserData) -> UserData:
-        if self.collection.find_one({"id": user.id}):
-            raise HTTPException(status_code=400, detail="User already exists")
-        self.collection.insert_one(user.model_dump())
-
-        return self.getUserInfo(user.id)
-
-    def updateUser(self, user: UserData) -> UserData:
-        if not self.collection.find_one({"id": user.id}):
+    def getUser(self, userId: str) -> UserItem:
+        user = self._collection.find_one({"id": userId})
+        if user:
+            return UserItem(**user)
+        else:
             raise HTTPException(status_code=404, detail="User not found")
-        self.collection.update_one({"id": user.id}, {"$set": user.model_dump()})
 
-        return self.getUserInfo(user.id)
+    def updateUser(self, userItem: UserItem) -> UserItem:
+        self._collection.update_one({"id": userItem.id}, {"$set": userItem.model_dump()})
+
+        user = self._collection.find_one({"id": userItem.id})
+        if userItem == user:
+            return UserItem(**user)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update user")
+
+    def deleteUser(self, userId: str) -> bool:
+        result = self._collection.delete_one({"id": userId})
+        return result.deleted_count > 0
