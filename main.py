@@ -10,11 +10,9 @@ from dotenv import load_dotenv
 
 from core.repo import UserRepository
 
-from repo.user_mongo import UserMongoRepo
-from repo.donation_test import DonationTestRepo
+from repo.userMongo import UserMongoRepo
 
 from router.userRouter import UserRouter
-from router.donationRouter import create_donation_router
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -32,7 +30,7 @@ db = client[MONGO_DB]
 ########## Dependency Injection ##########
 user_repo: UserRepository = UserMongoRepo(db)
 
-user_router = UserRouter(db, user_repo)
+user_router = UserRouter(user_repo)
 
 ########## FastAPI App ##########
 app = FastAPI(title="Eco-Footprint API", version="0.1")
