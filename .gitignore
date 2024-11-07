@@ -9,3 +9,5 @@ dev/*
 *.sh
 
 TODO.md
+
+*.memo.md
