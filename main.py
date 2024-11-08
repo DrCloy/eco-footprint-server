@@ -1,17 +1,17 @@
 # Import libraries and modules
 from typing import *
-from fastapi import FastAPI, responses, HTTPException, APIRouter
+from fastapi import FastAPI, responses, HTTPException, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 
 import os
 import pymongo
 
 from dotenv import load_dotenv
 
+from middleware.authParser import AuthParser
 from core.repo import UserRepository
-
 from repo.userMongo import UserMongoRepo
-
 from router.userRouter import UserRouter
 
 # Load environment variables
@@ -33,7 +33,8 @@ user_repo: UserRepository = UserMongoRepo(db)
 user_router = UserRouter(user_repo)
 
 ########## FastAPI App ##########
-app = FastAPI(title="Eco-Footprint API", version="0.1")
+security = HTTPBearer()
+app = FastAPI(title="Eco-Footprint API", version="0.1", dependencies=[Depends(security)])
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +43,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AuthParser)
 
 ########## Error Handlers ##########
 
@@ -56,6 +58,6 @@ def http_exception_handler(request, exc):
 
 ########## Add routers ##########
 app_router = APIRouter(prefix="/api")
-app_router.include_router(user_router)
+app_router.include_router(user_router, tags=["User"])
 
 app.include_router(app_router)
