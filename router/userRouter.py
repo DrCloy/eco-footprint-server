@@ -1,5 +1,3 @@
-import os
-
 from fastapi import APIRouter, Request, HTTPException
 from pymongo.database import Database
 
