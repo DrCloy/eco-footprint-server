@@ -6,7 +6,7 @@ from core.repo import UserRepository
 
 class UserRouter(APIRouter):
     def __init__(self, userRepo: UserRepository):
-        super().__init__()
+        super().__init__(prefix="/user")
         self._userRepo = userRepo
 
         self.add_api_route(path="/register", endpoint=self.register, methods=["POST"])
