@@ -1,5 +1,3 @@
-import pymongo
-
 from fastapi import HTTPException
 
 from pymongo.database import Database
