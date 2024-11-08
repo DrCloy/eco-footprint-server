@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Request, HTTPException
-from pymongo.database import Database
 
 from core.model import UserItem
 from core.repo import UserRepository
