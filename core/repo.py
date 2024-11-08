@@ -50,6 +50,10 @@ class CouponRepository(ABC):
         pass
 
     @abstractmethod
+    def getAllCoupons(self) -> list[CouponItemMeta]:
+        pass
+
+    @abstractmethod
     def getCoupon(self, couponId: str) -> CouponItem:
         pass
 
