@@ -14,7 +14,7 @@ class UserRouter(APIRouter):
         self.add_api_route(path="/profile", endpoint=self.updateProfile, methods=["Put"])
         self.add_api_route(path="/delete/{userId}", endpoint=self.deleteUser, methods=["DELETE"])
 
-    def register(self, userItem: UserItem, request: Request):
+    def register(self, userItem: UserItem, request: Request) -> UserItem:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -30,7 +30,7 @@ class UserRouter(APIRouter):
 
         return user
 
-    def getProfile(self, userId: str, request: Request):
+    def getProfile(self, userId: str, request: Request) -> UserItem:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -47,7 +47,7 @@ class UserRouter(APIRouter):
 
         return user
 
-    def updateProfile(self, userItem: UserItem, request: Request):
+    def updateProfile(self, userItem: UserItem, request: Request) -> UserItem:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -62,7 +62,7 @@ class UserRouter(APIRouter):
 
         return user
 
-    def deleteUser(self, userId: str, request: Request):
+    def deleteUser(self, userId: str, request: Request) -> bool:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
