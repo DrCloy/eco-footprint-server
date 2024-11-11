@@ -60,8 +60,7 @@ class AuthParser(BaseHTTPMiddleware):
         # Set request state auth to 'test' if the environment is 'test'
         if os.getenv("ENV_MODE") == "test":
             request.state.auth = {
-                "userId": request.headers.get("Authorization"),
-                "role": "test",
+                "aud": request.headers.get("Authorization"),
             }
             response = await call_next(request)
             return response
