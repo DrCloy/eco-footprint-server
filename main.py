@@ -10,9 +10,11 @@ import pymongo
 from dotenv import load_dotenv
 
 from middleware.authParser import AuthParser
-from core.repo import UserRepository
+from core.repo import UserRepository, FileRepository
 from repo.userMongo import UserMongoRepo
+from repo.fileMongo import FileMongoRepo
 from router.userRouter import UserRouter
+from router.fileRouter import FileRouter
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -29,8 +31,10 @@ db = client[MONGO_DB]
 
 ########## Dependency Injection ##########
 user_repo: UserRepository = UserMongoRepo(db)
+file_repo: FileRepository = FileMongoRepo(db)
 
 user_router = UserRouter(user_repo)
+file_router = FileRouter(user_repo, file_repo)
 
 ########## FastAPI App ##########
 security = HTTPBearer()
@@ -59,5 +63,6 @@ def http_exception_handler(request, exc):
 ########## Add routers ##########
 app_router = APIRouter(prefix="/api")
 app_router.include_router(user_router, tags=["User"])
+app_router.include_router(file_router, tags=["File"])
 
 app.include_router(app_router)
