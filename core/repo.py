@@ -112,7 +112,7 @@ class RewardRepository(ABC):
 
 class FileRepository(ABC):
     @abstractmethod
-    def createFile(self, file: UploadFile) -> FileData:
+    def createFile(self, file: UploadFile, userId: str) -> FileData:
         pass
 
     @abstractmethod
