@@ -114,6 +114,8 @@ class RewardItem(RewardItemMeta):
 
 class FileData(BaseModel):
     id: str
+    owner: str
     name: str
     size: int
     contentType: str
+    file: bytes
