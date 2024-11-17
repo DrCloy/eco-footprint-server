@@ -10,11 +10,14 @@ import pymongo
 from dotenv import load_dotenv
 
 from middleware.authParser import AuthParser
-from core.repo import UserRepository, FileRepository
+from core.repo import UserRepository, FileRepository, RewardRepository, CouponRepository
 from repo.userMongo import UserMongoRepo
 from repo.fileMongo import FileMongoRepo
+from repo.rewardMongo import RewardMongoRepo
+from repo.couponMongo import CouponMongoRepo
 from router.userRouter import UserRouter
 from router.fileRouter import FileRouter
+from router.rewardRouter import RewardRouter
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -32,9 +35,12 @@ db = client[MONGO_DB]
 ########## Dependency Injection ##########
 user_repo: UserRepository = UserMongoRepo(db)
 file_repo: FileRepository = FileMongoRepo(db)
+reward_repo: RewardRepository = RewardMongoRepo(db)
+coupon_repo: CouponRepository = CouponMongoRepo(db)
 
 user_router = UserRouter(user_repo)
 file_router = FileRouter(user_repo, file_repo)
+reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
 
 ########## FastAPI App ##########
 security = HTTPBearer()
@@ -64,5 +70,6 @@ def http_exception_handler(request, exc):
 app_router = APIRouter(prefix="/api")
 app_router.include_router(user_router, tags=["User"])
 app_router.include_router(file_router, tags=["File"])
+app_router.include_router(reward_router, tags=["Reward"])
 
 app.include_router(app_router)
