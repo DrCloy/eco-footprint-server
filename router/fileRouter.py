@@ -1,6 +1,6 @@
-from fastapi import UploadFile, File, HTTPException, Request, APIRouter, Response
+from fastapi import UploadFile, HTTPException, Request, APIRouter, Response
 
-from core.model import UserItem, FileData
+from core.model import FileData
 from core.repo import UserRepository, FileRepository
 
 
@@ -20,11 +20,13 @@ class FileRouter(APIRouter):
             raise HTTPException(status_code=400, detail="No file provided")
         if not request.state.auth:
             raise HTTPException(status_code=403, detail="Unauthorized")
+        if not self._userRepo.getUser(request.state.auth.get("sub")):
+            raise HTTPException(status_code=403, detail="Unauthorized")
 
-        return self._fileRepo.createFile(file, request.state.auth.get("aud"))
+        return self._fileRepo.createFile(file, request.state.auth.get("sub"))
 
     def getFile(self, fileId: str, request: Request):
-        user = self._userRepo.getUser(request.state.auth.get("aud"))
+        user = self._userRepo.getUser(request.state.auth.get("sub"))
         if not user:
             raise HTTPException(status_code=403, detail="Unauthorized")
         file = self._fileRepo.getFile(fileId)
@@ -40,13 +42,13 @@ class FileRouter(APIRouter):
             raise HTTPException(status_code=400, detail="No file provided")
         if not request.state.auth:
             raise HTTPException(status_code=403, detail="Unauthorized")
-        if not request.state.auth.get("aud") == self._fileRepo.getFile(fileId).owner:
+        if not request.state.auth.get("sub") == self._fileRepo.getFile(fileId).owner:
             raise HTTPException(status_code=403, detail="Unauthorized")
 
         return self._fileRepo.updateFile(file, self._fileRepo.getFile(fileId))
 
     def deleteFile(self, fileId: str, request: Request) -> bool:
-        if not request.state.auth.get("aud") == self._fileRepo.getFile(fileId).owner:
+        if not request.state.auth.get("sub") == self._fileRepo.getFile(fileId).owner:
             raise HTTPException(status_code=403, detail="Unauthorized")
 
         return self._fileRepo.deleteFile(fileId)
