@@ -34,11 +34,8 @@ class UserRouter(APIRouter):
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        if request.state.auth["role"] == "test":
-            pass
-        else:
-            if request.state.auth["sub"] != userId:
-                raise HTTPException(status_code=401, detail="Unauthorized")
+        if request.state.auth["sub"] != userId:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         user = self._userRepo.getUser(userId)
 
@@ -47,16 +44,19 @@ class UserRouter(APIRouter):
 
         return user
 
+    # TODO: 사용자의 권한으로는 수정할 수 없는 정보들에 대해서 어떻게 수정할 지 해결해야 함(point)
     def updateProfile(self, userItem: UserItem, request: Request) -> UserItem:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        if request.state.auth["role"] == "test":
-            pass
-        else:
-            if not self.getProfile(request.state.auth["sub"], request):
-                raise HTTPException(status_code=404, detail="User not found")
-        userItem.userId = request.state.auth["sub"]
+        user = self.getProfile(request.state.auth["sub"], request)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if not user.couponList == userItem.couponList:
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        if not user.challengeList == userItem.challengeList:
+            raise HTTPException(status_code=403, detail="Unauthorized")
 
         user = self._userRepo.updateUser(userItem)
 
