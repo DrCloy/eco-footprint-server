@@ -24,10 +24,6 @@ class CouponMongoRepo(CouponRepository):
         else:
             raise HTTPException(status_code=500, detail="Failed to create coupon")
 
-    def getAllCoupons(self) -> list[CouponItemMeta]:
-        coupons = self._collection.find()
-        return [CouponItemMeta(**coupon) for coupon in coupons]
-
     def getCoupon(self, couponId: str) -> CouponItem:
         coupon = self._collection.find_one({"id": couponId})
         if coupon:
