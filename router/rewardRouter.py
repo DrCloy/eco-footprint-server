@@ -29,6 +29,15 @@ class RewardRouter(APIRouter):
         self._couponRepo = couponRepo
         self._fileRepo = fileRepo
 
+        self.add_api_route(methods=["POST"], path="/create", endpoint=self.createReward)
+        self.add_api_route(methods=["GET"], path="/all", endpoint=self.getAllRewards)
+        self.add_api_route(methods=["GET"], path="/{rewardId}", endpoint=self.getReward)
+        self.add_api_route(methods=["PUT"], path="/update", endpoint=self.updateReward)
+        self.add_api_route(methods=["DELETE"], path="/delete/{rewardId}", endpoint=self.deleteReward)
+        self.add_api_route(methods=["POST"], path="/purchase/{rewardId}", endpoint=self.purchaseReward)
+        self.add_api_route(methods=["POST"], path="/extend/{couponId}", endpoint=self.extendExpiration)
+        self.add_api_route(methods=["DELETE"], path="/delete/{couponId}", endpoint=self.deleteCoupon)
+
     def createReward(self, rewardItem: RewardItem, request: Request) -> RewardItem:
         if os.getenv("ENV_MODE") == "test":
             pass
