@@ -1,5 +1,6 @@
-from fastapi import HTTPException
+from bson import ObjectId
 
+from fastapi import HTTPException
 from pymongo.database import Database
 
 from core.model import RewardItem, RewardItemMeta
@@ -13,6 +14,9 @@ class RewardMongoRepo(RewardRepository):
         self._collection = db["rewards"]
 
     def createReward(self, rewardItem: RewardItem) -> RewardItem:
+        if not rewardItem.id:
+            rewardItem.id = str(ObjectId())
+
         self._collection.insert_one(rewardItem.model_dump())
 
         reward = self._collection.find_one({"id": rewardItem.id})

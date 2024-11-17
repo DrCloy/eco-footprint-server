@@ -1,5 +1,6 @@
-from fastapi import HTTPException
+from bson import ObjectId
 
+from fastapi import HTTPException
 from pymongo.database import Database
 
 from core.model import CouponItem, CouponItemMeta
@@ -13,6 +14,8 @@ class CouponMongoRepo(CouponRepository):
         self._collection = db["coupons"]
 
     def createCoupon(self, couponItem: CouponItem) -> CouponItem:
+        if not couponItem.id:
+            couponItem.id = str(ObjectId())
         self._collection.insert_one(couponItem.model_dump())
 
         coupon = self._collection.find_one({"id": couponItem.id})
