@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Union, Optional
+from typing import Optional
 from enum import Enum
 
 
