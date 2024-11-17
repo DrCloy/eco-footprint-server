@@ -1,6 +1,6 @@
 import os
 import json
-from jwcrypto import jwk, jwt, jws, common
+from jwcrypto import jwk, jwt, common
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import HTTPException
@@ -59,9 +59,10 @@ class AuthParser(BaseHTTPMiddleware):
 
         # Set request state auth to 'test' if the environment is 'test'
         if os.getenv("ENV_MODE") == "test":
-            request.state.auth = {
-                "sub": request.headers.get("Authorization").split(" ")[1],
-            }
+            if request.headers.get("Authorization"):
+                request.state.auth = {
+                    "sub": request.headers.get("Authorization").split(" ")[1],
+                }
             response = await call_next(request)
             return response
 
