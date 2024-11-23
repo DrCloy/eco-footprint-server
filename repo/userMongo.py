@@ -26,7 +26,7 @@ class UserMongoRepo(UserRepository):
         if user:
             return UserItem(**user)
         else:
-            raise HTTPException(status_code=404, detail="User not found")
+            return None
 
     def updateUser(self, userItem: UserItem) -> UserItem:
         self._collection.update_one({"id": userItem.id}, {"$set": userItem.model_dump()})

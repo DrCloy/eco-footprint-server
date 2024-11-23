@@ -11,21 +11,18 @@ class UserRouter(APIRouter):
 
         self.add_api_route(path="/register", endpoint=self.register, methods=["POST"])
         self.add_api_route(path="/profile/{userId}", endpoint=self.getProfile, methods=["GET"])
-        self.add_api_route(path="/profile", endpoint=self.updateProfile, methods=["Put"])
+        self.add_api_route(path="/profile", endpoint=self.updateProfile, methods=["PUT"])
         self.add_api_route(path="/delete/{userId}", endpoint=self.deleteUser, methods=["DELETE"])
 
     def register(self, userItem: UserItem, request: Request) -> UserItem:
         if request.state.auth is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        if request.state.auth["role"] == "test":
-            userId = request.state.auth["userId"]
-        else:
-            userId = request.state.auth["sub"]
-            if self.getProfile(userId, request):
-                raise HTTPException(status_code=409, detail="User already exists")
+        userId = request.state.auth["sub"]
+        if self._userRepo.getUser(userId):
+            raise HTTPException(status_code=409, detail="User already exists")
 
-        userItem.userId = userId
+        userItem.id = userId
         user = self._userRepo.createUser(userItem)
 
         return user
