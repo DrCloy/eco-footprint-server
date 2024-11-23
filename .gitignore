@@ -11,3 +11,5 @@ dev/*
 TODO.md
 
 *.memo.md
+
+nohup.out
