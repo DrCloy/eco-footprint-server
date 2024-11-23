@@ -45,6 +45,7 @@ class ChallengeItemMeta(BaseModel):
 class ChallengeRecordItem(BaseModel):
     userId: str
     imageId: str
+    approved: bool = False
 
 
 class RewardItemMeta(BaseModel):
@@ -117,5 +118,6 @@ class FileData(BaseModel):
     owner: str
     name: str
     size: int
+    date: str
     contentType: str
     file: bytes
