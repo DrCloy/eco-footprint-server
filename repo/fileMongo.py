@@ -9,12 +9,26 @@ from core.repo import FileRepository
 
 
 class FileMongoRepo(FileRepository):
+    """
+    Implementation of FileRepository using MongoDB
+    """
+
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
         self._collection = db["files"]
 
     def createFile(self, file: UploadFile, userId: str) -> FileData:
+        """
+        Create a new file
+
+        Args:
+            file (UploadFile): File to be uploaded
+            userId (str): User ID of the owner of the file
+
+        Returns:
+            FileData: FileData object of the uploaded file
+        """
         fileData = FileData(
             id=str(ObjectId()),
             owner=userId,
@@ -29,6 +43,15 @@ class FileMongoRepo(FileRepository):
         return fileData
 
     def getFile(self, fileId: str) -> FileData:
+        """
+        Get file by ID
+
+        Args:
+            fileId (str): ID of the file
+
+        Returns:
+            FileData: FileData object of the file if found, None otherwise
+        """
         file = self._collection.find_one({"id": fileId})
         if file:
             return FileData(
@@ -40,9 +63,19 @@ class FileMongoRepo(FileRepository):
                 file=base64.b64decode(file["file"])
             )
         else:
-            raise HTTPException(status_code=404, detail="File not found")
+            return None
 
     def updateFile(self, file: UploadFile, fileData: FileData) -> FileData:
+        """
+        Update file data with new file
+
+        Args:
+            file (UploadFile): New file to be uploaded
+            fileData (FileData): FileData object to be updated
+
+        Returns:
+            FileData: FileData object of the updated file if successful, None otherwise
+        """
         fileData.name = file.filename
         fileData.contentType = file.content_type
         fileData.size = file.size
@@ -50,8 +83,29 @@ class FileMongoRepo(FileRepository):
 
         self._collection.update_one({"id": fileData.id}, {"$set": fileData.model_dump()})
 
-        return fileData
+        newFile = self._collection.find_one({"id": fileData.id})
+
+        if fileData == newFile:
+            return FileData(
+                id=newFile["id"],
+                owner=newFile["owner"],
+                name=newFile["name"],
+                contentType=newFile["contentType"],
+                size=newFile["size"],
+                file=base64.b64decode(newFile["file"])
+            )
+        else:
+            return None
 
     def deleteFile(self, fileId: str) -> bool:
+        """
+        Delete file by ID
+
+        Args:
+            fileId (str): ID of the file
+
+        Returns:
+            bool: True if file is deleted, False otherwise
+        """
         result = self._collection.delete_one({"id": fileId})
         return result.deleted_count > 0
