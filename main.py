@@ -44,7 +44,7 @@ reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
 
 ########## FastAPI App ##########
 security = HTTPBearer()
-app = FastAPI(title="Eco-Footprint API", version="0.1", dependencies=[Depends(security)])
+app = FastAPI(title="Eco-Footprint API", version="0.1", dependencies=[Depends(security)], docs_url="/balloon/docs")
 
 app.add_middleware(
     CORSMiddleware,
