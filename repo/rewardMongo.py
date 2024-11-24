@@ -11,7 +11,7 @@ class RewardMongoRepo(RewardRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
-        self._collection = db["rewards"]
+        self._collection = self._db["rewards"]
 
     def createReward(self, rewardItem: RewardItem) -> RewardItem:
         if not rewardItem.id:
