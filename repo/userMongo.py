@@ -8,9 +8,7 @@ from core.repo import UserRepository
 
 class UserMongoRepo(UserRepository):
     """
-    Implementation of UserRepository using MongoDB
-
-
+    Implementation of UserRepository interface for MongoDB
     """
 
     def __init__(self, db: Database):
