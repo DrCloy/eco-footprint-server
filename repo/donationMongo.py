@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from core.model import UserItemMeta, UserItem, DonationItemMeta, DonationItem
+from core.model import DonationItemMeta, DonationItem
 from core.repo import DonationRepository
 
 
