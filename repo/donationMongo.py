@@ -22,7 +22,7 @@ class DonationMongoRepo(DonationRepository):
             donationItem (DonationItem): The donation item to create
 
         Raises:
-            HTTPException: If the donation item cannot be created
+            HTTPException(status_code=500): If the donation item cannot be created
 
         Returns:
             DonationItem: The created donation item
@@ -69,7 +69,7 @@ class DonationMongoRepo(DonationRepository):
             donationItem (DonationItem): The donation item to update
 
         Raises:
-            HTTPException: If the donation item cannot be updated
+            HTTPException(status_code=500): If the donation item cannot be updated
 
         Returns:
             DonationItem: The updated donation item

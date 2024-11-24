@@ -24,7 +24,7 @@ class UserMongoRepo(UserRepository):
             userItem (UserItem): UserItem object
 
         Raises:
-            HTTPException: If failed to create user
+            HTTPException(status_code=500): If failed to create user
 
         Returns:
             UserItem: UserItem object
@@ -61,7 +61,7 @@ class UserMongoRepo(UserRepository):
             userItem (UserItem): UserItem object
 
         Raises:
-            HTTPException: If failed to update user
+            HTTPException(status_code=500): If failed to update user
 
         Returns:
             UserItem: UserItem object

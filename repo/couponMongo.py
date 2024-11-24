@@ -25,7 +25,7 @@ class CouponMongoRepo(CouponRepository):
             couponItem (CouponItem): Coupon item to be created
 
         Raises:
-            HTTPException: Failed to create coupon
+            HTTPException(status_code=500): If the coupon item cannot be created
 
         Returns:
             CouponItem: Created coupon item
@@ -64,7 +64,7 @@ class CouponMongoRepo(CouponRepository):
             couponItem (CouponItem): Coupon item to be updated
 
         Raises:
-            HTTPException: Failed to update coupon
+            HTTPException(status_code=500): Failed to update coupon
 
         Returns:
             CouponItem: Updated coupon item

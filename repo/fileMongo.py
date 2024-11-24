@@ -26,6 +26,9 @@ class FileMongoRepo(FileRepository):
             file (UploadFile): File to be uploaded
             userId (str): User ID of the owner of the file
 
+        Raises:
+            HTTPException(status_code=500): If failed to create file
+
         Returns:
             FileData: FileData object of the uploaded file
         """
@@ -40,7 +43,19 @@ class FileMongoRepo(FileRepository):
 
         self._collection.insert_one(fileData.model_dump())
 
-        return fileData
+        uploadedFile = self._collection.find_one({"id": fileData.id})
+
+        if uploadedFile:
+            return FileData(
+                id=uploadedFile["id"],
+                owner=uploadedFile["owner"],
+                name=uploadedFile["name"],
+                contentType=uploadedFile["contentType"],
+                size=uploadedFile["size"],
+                file=base64.b64decode(uploadedFile["file"])
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Failed to create file")
 
     def getFile(self, fileId: str) -> FileData:
         """
@@ -73,8 +88,11 @@ class FileMongoRepo(FileRepository):
             file (UploadFile): New file to be uploaded
             fileData (FileData): FileData object to be updated
 
+        Raises:
+            HTTPException(status_code=500): If failed to update file
+
         Returns:
-            FileData: FileData object of the updated file if successful, None otherwise
+            FileData: Updated FileData object
         """
         fileData.name = file.filename
         fileData.contentType = file.content_type
@@ -95,7 +113,7 @@ class FileMongoRepo(FileRepository):
                 file=base64.b64decode(newFile["file"])
             )
         else:
-            return None
+            raise HTTPException(status_code=500, detail="Failed to update file")
 
     def deleteFile(self, fileId: str) -> bool:
         """

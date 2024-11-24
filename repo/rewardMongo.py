@@ -25,10 +25,11 @@ class RewardMongoRepo(RewardRepository):
             rewardItem (RewardItem): Reward item to create
 
         Raises:
-            HTTPException: If failed to create reward
+            HTTPException(status_code=500): If failed to create reward
 
         Returns:
-            RewardItem: Created reward item"""
+            RewardItem: Created reward item
+        """
         if not rewardItem.id:
             rewardItem.id = str(ObjectId())
 
@@ -74,7 +75,7 @@ class RewardMongoRepo(RewardRepository):
             rewardItem (RewardItem): Reward item to update
 
         Raises:
-            HTTPException: If failed to update reward
+            HTTPException(status_code=500): If failed to update reward
 
         Returns:
             RewardItem: Updated reward item

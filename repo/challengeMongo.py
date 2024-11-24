@@ -26,7 +26,7 @@ class ChallengeMongoRepo(ChallengeRepository):
             challengeItem (ChallengeItem): ChallengeItem object
 
         Raises:
-            HTTPException: If failed to create challenge
+            HTTPException(status_code=500): If failed to create challenge
 
         Returns:
             ChallengeItem: Created ChallengeItem object
@@ -73,7 +73,7 @@ class ChallengeMongoRepo(ChallengeRepository):
             challengeItem (ChallengeItem): ChallengeItem object
 
         Raises:
-            HTTPException: If failed to update challenge
+            HTTPException(status_code=500): If failed to update challenge
 
         Returns:
             ChallengeItem: Updated ChallengeItem object
