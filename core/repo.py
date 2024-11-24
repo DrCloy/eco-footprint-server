@@ -18,7 +18,7 @@ class UserRepository(ABC):
             userItem (UserItem): UserItem object
 
         Raises:
-            HTTPException(500): If failed to create user
+            HTTPException(status_code=500): If failed to create user
 
         Returns:
             UserItem: UserItem object
@@ -47,7 +47,7 @@ class UserRepository(ABC):
             userItem (UserItem): UserItem object
 
         Raises:
-            HTTPException(500): If failed to update user
+            HTTPException(status_code=500): If failed to update
 
         Returns:
             UserItem: UserItem object
