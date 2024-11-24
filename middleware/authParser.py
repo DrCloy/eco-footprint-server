@@ -57,17 +57,17 @@ class AuthParser(BaseHTTPMiddleware):
         # Add 'auth' to the request state
         request.state.auth = None
 
+        # Get the Authorization header
+        auth_header = request.headers.get("Authorization")
+
         # Set request state auth to 'test' if the environment is 'test'
         if os.getenv("ENV_MODE") == "test":
-            if request.headers.get("Authorization"):
+            if auth_header:
                 request.state.auth = {
-                    "sub": request.headers.get("Authorization").split(" ")[1],
+                    "sub": auth_header.split(" ")[1],
                 }
             response = await call_next(request)
             return response
-
-        # Get the Authorization header
-        auth_header = request.headers.get("Authorization")
 
         if auth_header:
             # Split the header into the type and token
