@@ -134,7 +134,15 @@ class FileRouter(APIRouter):
             raise HTTPException(status_code=403, detail="Unauthorized")
         if not request.state.auth.get("sub"):
             raise HTTPException(status_code=403, detail="Unauthorized")
-        if not request.state.auth.get("sub") == self._fileRepo.getFile(fileId).owner:
+
+        userId = request.state.auth.get("sub")
+        if not self._userRepo.getUser(userId):
+            raise HTTPException(status_code=403, detail="Unauthorized")
+
+        fileData = self._fileRepo.getFile(fileId)
+        if not fileData:
+            raise HTTPException(status_code=404, detail="File not found")
+        if fileData.owner != userId:
             raise HTTPException(status_code=403, detail="Unauthorized")
 
         return self._fileRepo.deleteFile(fileId)
