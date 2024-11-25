@@ -17,7 +17,7 @@ from repo.rewardMongo import RewardMongoRepo
 from repo.couponMongo import CouponMongoRepo
 from router.userRouter import UserRouter
 from router.fileRouter import FileRouter
-from router.rewardRouter import RewardRouter
+from router.tempRewardRouter import RewardRouter
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
