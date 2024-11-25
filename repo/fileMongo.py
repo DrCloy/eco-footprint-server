@@ -32,13 +32,14 @@ class FileMongoRepo(FileRepository):
         Returns:
             FileData: FileData object of the uploaded file
         """
+        fileContent = file.file.read()
         fileData = FileData(
             id=str(ObjectId()),
             owner=userId,
             name=file.filename,
             contentType=file.content_type,
             size=file.size,
-            file=base64.b64encode(file.file.read()).decode("utf-8"),
+            file=base64.b64encode(fileContent).decode("utf-8"),
             isPrivate=isPrivate
         )
 
@@ -53,7 +54,8 @@ class FileMongoRepo(FileRepository):
                 name=uploadedFile["name"],
                 contentType=uploadedFile["contentType"],
                 size=uploadedFile["size"],
-                file=base64.b64decode(uploadedFile["file"])
+                file=uploadedFile["file"],
+                isPrivate=uploadedFile["isPrivate"]
             )
         else:
             raise HTTPException(status_code=500, detail="Failed to create file")

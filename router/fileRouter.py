@@ -21,7 +21,7 @@ class FileRouter(APIRouter):
         self.add_api_route('/update/{fileId}', self._updateFile, methods=['PUT'])
         self.add_api_route('/delete/{fileId}', self._deleteFile, methods=['DELETE'])
 
-    def _createFile(self, isPrivate: bool, file: UploadFile, request: Request) -> FileData:
+    def _createFile(self, file: UploadFile, request: Request, isPrivate: bool = False) -> FileData:
         """
         Create a new file
         This method creates a new file with the given file.
@@ -46,7 +46,9 @@ class FileRouter(APIRouter):
         if not self._userRepo.getUser(userId):
             raise HTTPException(status_code=403, detail="Unauthorized")
 
-        return self._fileRepo.createFile(file, userId, isPrivate)
+        uploadedFile = self._fileRepo.createFile(file, userId, isPrivate)
+
+        return uploadedFile
 
     def _getFile(self, fileId: str, request: Request):
         """
