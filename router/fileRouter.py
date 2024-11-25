@@ -24,7 +24,6 @@ class FileRouter(APIRouter):
     def _createFile(self, file: UploadFile, request: Request, isPrivate: bool = False) -> FileData:
         """
         Create a new file
-        This method creates a new file with the given file.
 
         Args:
             file (UploadFile): The file to create
@@ -53,7 +52,6 @@ class FileRouter(APIRouter):
     def _getFile(self, fileId: str, request: Request):
         """
         Get a file by ID
-        This method gets a file by its ID.
 
         Args:
             fileId (str): The ID of the file
@@ -86,7 +84,6 @@ class FileRouter(APIRouter):
     def _updateFile(self, fileId: str, file: UploadFile, request: Request) -> FileData:
         """
         Update a file
-        This method updates a file with the given file.
 
         Args:
             fileId (str): The ID of the file
@@ -120,7 +117,6 @@ class FileRouter(APIRouter):
     def _deleteFile(self, fileId: str, request: Request) -> bool:
         """
         Delete a file
-        This method deletes a file by its ID.
 
         Args:
             fileId (str): The ID of the file

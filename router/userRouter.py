@@ -23,7 +23,6 @@ class UserRouter(APIRouter):
     def _register(self, userItem: UserItem, request: Request) -> UserItem:
         """
         Register a new user
-        This method registers a new user with the given userItem.
 
         Args:
             userItem (UserItem): The userItem to register
@@ -51,10 +50,6 @@ class UserRouter(APIRouter):
     def _getProfile(self, userId: str, request: Request) -> UserItem:
         """
         Get the user profile with userId
-
-        This method gets the user profile with the given userId.
-        If the user is not authenticated, it will return a 401 error.
-        If the user is not found, it will return a 404 error.
 
         Args:
             userId (str): The userId to get the profile
@@ -84,7 +79,6 @@ class UserRouter(APIRouter):
     def _updateProfile(self, userItem: UserItem, request: Request) -> UserItem:
         """
         Update the user profile with userItem
-        This method updates the user profile with the given userItem.
 
         Args:
             userItem (UserItem): The userItem to update
@@ -127,7 +121,6 @@ class UserRouter(APIRouter):
     def _deleteUser(self, userId: str, request: Request) -> bool:
         """
         Delete the user with userId
-        This method deletes the user with the given userId.
 
         Args:
             userId (str): The userId to delete
