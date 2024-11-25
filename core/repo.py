@@ -360,7 +360,7 @@ class FileRepository(ABC):
     """
 
     @abstractmethod
-    def createFile(self, file: UploadFile, userId: str) -> FileData:
+    def createFile(self, file: UploadFile, userId: str, isPrivate: bool = False) -> FileData:
         """
         Create a new file
 

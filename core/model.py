@@ -104,6 +104,7 @@ class ChallengeItem(ChallengeItemMeta):
 
 class RewardItem(RewardItemMeta):
     id: str
+    owner: str
     itemName: str
     brandName: str
     itemType: str
@@ -121,3 +122,4 @@ class FileData(BaseModel):
     size: int
     contentType: str
     file: bytes
+    isPrivate: bool = False

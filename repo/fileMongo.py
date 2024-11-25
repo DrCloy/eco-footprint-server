@@ -18,7 +18,7 @@ class FileMongoRepo(FileRepository):
         self._db = db
         self._collection = db["files"]
 
-    def createFile(self, file: UploadFile, userId: str) -> FileData:
+    def createFile(self, file: UploadFile, userId: str, isPrivate: bool = False) -> FileData:
         """
         Create a new file
 
@@ -38,7 +38,8 @@ class FileMongoRepo(FileRepository):
             name=file.filename,
             contentType=file.content_type,
             size=file.size,
-            file=base64.b64encode(file.file.read()).decode("utf-8")
+            file=base64.b64encode(file.file.read()).decode("utf-8"),
+            isPrivate=isPrivate
         )
 
         self._collection.insert_one(fileData.model_dump())
