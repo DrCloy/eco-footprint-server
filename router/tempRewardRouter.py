@@ -7,21 +7,20 @@ from fastapi import APIRouter, HTTPException, Request
 from core.model import RewardItem, RewardItemMeta, CouponItem, CouponItemMeta, FileData
 from core.repo import UserRepository, RewardRepository, CouponRepository, FileRepository
 
-coupon_bugger = [
-    '6739d85dccd5dff0b84a1652', '6739da95530613b298315b84', '6739daab530613b298315b86', '6739dab7530613b298315b88',
-    '6739dac6530613b298315b8a', '6739dad9530613b298315b8c', '6739dae6530613b298315b8e', '6739daef530613b298315b90',
-    '6739daf6530613b298315b92', '6739dafe530613b298315b94']
-coupon_chicken = [
-    '6739db1394d7281d17ff9848', '6739db1994d7281d17ff984a', '6739db3894d7281d17ff984c', '6739db3d94d7281d17ff984e',
-    '6739db4494d7281d17ff9850', '6739db4a94d7281d17ff9852', '6739db5094d7281d17ff9854', '6739db5494d7281d17ff9856',
-    '6739db5c94d7281d17ff9858', '6739db6794d7281d17ff985a']
-coupon_coffee = [
-    '6739db7894d7281d17ff985c', '6739db8494d7281d17ff9860', '6739dc0894d7281d17ff9862', '6739dc1394d7281d17ff9864',
-    '6739dc1b94d7281d17ff9866', '6739dc2094d7281d17ff9868', '6739dc2794d7281d17ff986a', '6739dc2f94d7281d17ff986c',
-    '6739dc3894d7281d17ff986e', '6739dc3e94d7281d17ff9870']
+coupon_bugger = ['6744a8355885bfc26714aa32', '6744a861d3331dac07b19577', '6744a86cd3331dac07b19579',
+                 '6744a86cd3331dac07b19579', '6744a881d3331dac07b1957d', '6744a889d3331dac07b1957f', '6744a891d3331dac07b19581']
+coupon_chicken = ['6744a89c7f333de2df997e7b', '6744a8a47f333de2df997e7d']
+coupon_coffee = ['6744a8ad7f333de2df997e7f', '6744a8b57f333de2df997e81', '6744a8bd7f333de2df997e83']
 
 
 class RewardRouter(APIRouter):
+    """
+    Reward Router Class
+
+    This class is a router class for reward-related API endpoints.
+    This class will be exchanged when gift coupon API is available.
+    """
+
     def __init__(self, userRepo: UserRepository, rewardRepo: RewardRepository, couponRepo: CouponRepository, fileRepo: FileRepository):
         super().__init__(prefix="/reward")
         self._userRepo = userRepo
@@ -39,41 +38,117 @@ class RewardRouter(APIRouter):
         self.add_api_route(methods=["DELETE"], path="/delete/{couponId}", endpoint=self.deleteCoupon)
 
     def createReward(self, rewardItem: RewardItem, request: Request) -> RewardItem:
-        if os.getenv("ENV_MODE") == "test":
-            pass
-        else:
-            if not os.getenv("ADMIN_USER") == request.state.auth.get("sub"):
-                raise HTTPException(status_code=403, detail="Forbidden")
+        """
+        Create a new reward item
+
+        Args:
+            rewardItem (RewardItem): The rewardItem to create
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=401): If the user is not authorized
+
+        Returns:
+            RewardItem: The created rewardItem
+        """
+        if request.state.auth:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if not request.state.auth.get("sub"):
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         reward = self._rewardRepo.createReward(rewardItem)
         return reward
 
     def getAllRewards(self) -> list[RewardItemMeta]:
+        """
+        Get all rewards
+
+        Returns:
+            list[RewardItemMeta]: A list of RewardItemMeta
+        """
         return self._rewardRepo.getAllRewards()
 
     def getReward(self, rewardId: str) -> RewardItem:
+        """
+        Get a reward by rewardId
+
+        Args:
+            rewardId (str): The rewardId to get
+
+        Returns:
+            RewardItem: The rewardItem
+        """
         return self._rewardRepo.getReward(rewardId)
 
     def updateReward(self, rewardItem: RewardItem, request: Request) -> RewardItem:
-        if os.getenv("ENV_MODE") == "test":
-            pass
-        else:
-            if not os.getenv("ADMIN_USER") == request.state.auth.get("sub"):
-                raise HTTPException(status_code=403, detail="Forbidden")
+        """
+        Update a reward item
+
+        Args:
+            rewardItem (RewardItem): The rewardItem to update
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=401): If the user is not authorized
+            HTTPException(status_code=403): If the user is not an admin
+
+        Returns:
+            RewardItem: The updated rewardItem
+        """
+        if not request.state.auth:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if not request.state.auth.get("sub"):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        userId = request.state.auth.get("sub")
+        user = self._userRepo.getUser(userId)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
         reward = self._rewardRepo.updateReward(rewardItem)
         return reward
 
     def deleteReward(self, rewardId: str, request: Request) -> bool:
-        if os.getenv("ENV_MODE") == "test":
-            pass
-        else:
-            if not os.getenv("ADMIN_USER") == request.state.auth.get("sub"):
-                raise HTTPException(status_code=403, detail="Forbidden")
+        """
+        Delete a reward item
+
+        Args:
+            rewardId (str): The rewardId to delete
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=401): If the user is not authorized
+            HTTPException(status_code=403): If the user is not an admin
+
+        Returns:
+            bool: True if the reward is deleted, False otherwise"""
+        if not request.state.auth:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if not request.state.auth.get("sub"):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        userId = request.state.auth.get("sub")
+        user = self._userRepo.getUser(userId)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
         return self._rewardRepo.deleteReward(rewardId)
 
     def purchaseReward(self, rewardId: str, request: Request) -> CouponItem:
+        """
+        Purchase a reward item and add it to the user's coupon list
+
+        Args:
+            rewardId (str): The rewardId to purchase
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=400): If the user does not have enough points
+            HTTPException(status_code=401): If the user is not authorized
+
+        Returns:
+            CouponItem: The purchased coupon item
+        """
         if not request.state.auth:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -83,9 +158,6 @@ class RewardRouter(APIRouter):
             raise HTTPException(status_code=400, detail="Not enough point")
         user.point -= reward.point
 
-        # TODO: 기프티콘 API를 호출하여 기프티콘을 발급, 기프티콘 이미지를 저장
-
-        # TODO: 기프티콘 API를 사용하는 기눙 추가 이후, 아래 코드와 위의 쿠폰 ID 삭제
         if reward.itemType == '햄버거':
             couponId = random.choice(coupon_bugger)
         elif reward.itemType == '치킨':
@@ -109,6 +181,20 @@ class RewardRouter(APIRouter):
         return coupon
 
     def extendExpiration(self, couponId: str, request: Request) -> CouponItem:
+        """
+        Extend coupon expriation date
+
+        Args:
+            couponId (str): The couponId to extend expiration
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=400): If the coupon is not found
+            HTTPException(status_code=401): If the user is not authorized
+
+        Returns:
+            CouponItem: The extended coupon item
+        """
         if not request.state.auth:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -123,6 +209,20 @@ class RewardRouter(APIRouter):
         return coupon
 
     def deleteCoupon(self, couponId: str, request: Request) -> bool:
+        """
+        Delete a coupon item
+
+        Args:
+            couponId (str): The couponId to delete
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=400): If the coupon is not found
+            HTTPException(status_code=401): If the user is not authorized
+
+        Returns:
+            bool: True if the coupon is deleted, False otherwise
+        """
         if not request.state.auth:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
