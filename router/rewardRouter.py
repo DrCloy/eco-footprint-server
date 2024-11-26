@@ -46,7 +46,7 @@ class RewardRouter(APIRouter):
         Returns:
             RewardItem: The created rewardItem
         """
-        if request.state.auth:
+        if not request.state.auth:
             raise HTTPException(status_code=401, detail="Unauthorized")
         if not request.state.auth.get("sub"):
             raise HTTPException(status_code=401, detail="Unauthorized")
@@ -152,9 +152,9 @@ class RewardRouter(APIRouter):
 
         user = self._userRepo.getUser(request.state.auth.get("sub"))
         reward = self._rewardRepo.getReward(rewardId)
-        if user.point < reward.point:
+        if user.point < reward.price:
             raise HTTPException(status_code=400, detail="Not enough point")
-        user.point -= reward.point
+        user.point -= reward.price
 
         # TODO: Implement coupon generation using gift coupon API
         couponId = ''
