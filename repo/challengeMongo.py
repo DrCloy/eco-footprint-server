@@ -16,6 +16,9 @@ class ChallengeMongoRepo(ChallengeRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
+
+        if self._db.get_collection("challenges") is None:
+            self._db.create_collection("challenges")
         self._collection = self._db["challenges"]
 
     def createChallenge(self, challengeItem: ChallengeItem) -> ChallengeItem:

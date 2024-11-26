@@ -12,6 +12,9 @@ class DonationMongoRepo(DonationRepository):
     def __init__(self, db):
         super().__init__()
         self._db = db
+
+        if self._db.get_collection("donations") is None:
+            self._db.create_collection("donations")
         self._collection = db["donations"]
 
     def createDonation(self, donationItem: DonationItem) -> DonationItem:

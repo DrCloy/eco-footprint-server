@@ -16,6 +16,9 @@ class FileMongoRepo(FileRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
+
+        if self._db.get_collection("files") is None:
+            self._db.create_collection("files")
         self._collection = db["files"]
 
     def createFile(self, file: UploadFile, userId: str, isPrivate: bool = False) -> FileData:

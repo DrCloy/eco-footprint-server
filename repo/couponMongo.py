@@ -15,6 +15,9 @@ class CouponMongoRepo(CouponRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
+
+        if self._db.get_collection("coupons") is None:
+            self._db.create_collection("coupons")
         self._collection = db["coupons"]
 
     def createCoupon(self, couponItem: CouponItem) -> CouponItem:

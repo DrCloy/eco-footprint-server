@@ -14,6 +14,9 @@ class UserMongoRepo(UserRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
+
+        if self._db.get_collection("users") is None:
+            self._db.create_collection("users")
         self._collection = db["users"]
 
     def createUser(self, userItem: UserItem) -> UserItem:

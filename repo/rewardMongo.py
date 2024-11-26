@@ -15,6 +15,9 @@ class RewardMongoRepo(RewardRepository):
     def __init__(self, db: Database):
         super().__init__()
         self._db = db
+        if self._db.get_collection("rewards") is None:
+            self._db.create_collection("rewards")
+
         self._collection = self._db["rewards"]
 
     def createReward(self, rewardItem: RewardItem) -> RewardItem:
@@ -30,8 +33,7 @@ class RewardMongoRepo(RewardRepository):
         Returns:
             RewardItem: Created reward item
         """
-        if not rewardItem.id:
-            rewardItem.id = str(ObjectId())
+        rewardItem.id = str(ObjectId())
 
         self._collection.insert_one(rewardItem.model_dump())
 
