@@ -54,7 +54,7 @@ class RewardItemMeta(BaseModel):
     itemName: str
     brandName: str
     itemType: str
-    point: int = Field(..., ge=0)
+    price: int = Field(..., ge=0)
     thumbnailId: str
 
 
@@ -104,7 +104,6 @@ class ChallengeItem(ChallengeItemMeta):
 
 class RewardItem(RewardItemMeta):
     id: str
-    owner: str
     itemName: str
     brandName: str
     itemType: str
