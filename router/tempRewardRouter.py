@@ -124,7 +124,8 @@ class RewardRouter(APIRouter):
             HTTPException(status_code=403): If the user is not an admin
 
         Returns:
-            bool: True if the reward is deleted, False otherwise"""
+            bool: True if the reward is deleted, False otherwise
+        """
         if not request.state.auth:
             raise HTTPException(status_code=401, detail="Unauthorized")
         if not request.state.auth.get("sub"):
@@ -172,29 +173,18 @@ class RewardRouter(APIRouter):
         elif reward.itemType == '커피':
             couponId = random.choice(coupon_coffee)
         try:
-            couponImage = self._fileRepo.getFile(couponId)
-            imageFile = io.BytesIO(base64.b64decode(couponImage.file))
-            newCouponImage = self._fileRepo.createFile(
-                file=UploadFile(
-                    file=imageFile,
-                    size=couponImage.size,
-                    filename=couponImage.name,
-                    content_type=couponImage.contentType
-                ),
-                userId=userId,
-                isPrivate=True)
-
             coupon = CouponItem(
+                id='',
                 itemName=reward.itemName,
                 brandName=reward.brandName,
                 description=reward.description,
                 thumbnailId=couponId,
-                couponId=newCouponImage.id,
+                couponId=couponId,
                 expiredAt=str(int((datetime.datetime.now() + datetime.timedelta(days=7)).timestamp()))
             )
             coupon = self._couponRepo.createCoupon(coupon)
 
-            user.couponList.append(CouponItemMeta(**coupon))
+            user.couponList.append(CouponItemMeta(**coupon.dict()))
             user.point -= reward.price
             user = self._userRepo.updateUser(user)
 
@@ -224,7 +214,6 @@ class RewardRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth.get("sub")
-
         user = self._userRepo.getUser(userId)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
