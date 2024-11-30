@@ -72,8 +72,9 @@ class UserMongoRepo(UserRepository):
         self._collection.update_one({"id": userItem.id}, {"$set": userItem.model_dump()})
 
         user = self._collection.find_one({"id": userItem.id})
-        if userItem == user:
-            return UserItem(**user)
+        newUser = UserItem(**user)
+        if newUser == userItem:
+            return newUser
         else:
             raise HTTPException(status_code=500, detail="Failed to update user")
 
