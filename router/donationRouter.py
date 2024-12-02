@@ -138,7 +138,8 @@ class DonationRouter(APIRouter):
         # TODO: If the user has watched an ad, add points to the donation and the user
 
         donation.participants.append(userId)
-        self._donationRepo.updateDonation(donation)
+        donation = self._donationRepo.updateDonation(donation)
+        return donation
 
     def _deleteDonation(self, donationId: str, request: Request):
         """
