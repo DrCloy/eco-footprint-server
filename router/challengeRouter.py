@@ -2,7 +2,7 @@ from datetime import datetime
 from bson import ObjectId
 from fastapi import APIRouter, Request, HTTPException
 
-from core.model import UserItem, UserItemMeta, ChallengeItem, ChallengeRecordItem
+from core.model import UserItemMeta, ChallengeItem, ChallengeRecordItem
 from core.repo import UserRepository, ChallengeRepository, FileRepository
 
 
