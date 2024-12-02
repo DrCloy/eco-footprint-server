@@ -35,6 +35,7 @@ class ChallengeMongoRepo(ChallengeRepository):
             ChallengeItem: Created ChallengeItem object
         """
         challengeItem.id = str(ObjectId())
+        challengeItem.state = "active"
         self._collection.insert_one(challengeItem.model_dump())
 
         challenge = self._collection.find_one({"id": challengeItem.id})
