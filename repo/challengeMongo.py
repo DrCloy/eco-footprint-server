@@ -34,6 +34,7 @@ class ChallengeMongoRepo(ChallengeRepository):
         Returns:
             ChallengeItem: Created ChallengeItem object
         """
+        challengeItem.id = str(ObjectId())
         self._collection.insert_one(challengeItem.model_dump())
 
         challenge = self._collection.find_one({"id": challengeItem.id})
