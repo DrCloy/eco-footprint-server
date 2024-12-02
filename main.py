@@ -22,6 +22,7 @@ from router.fileRouter import FileRouter
 from router.tempRewardRouter import RewardRouter
 from router.donationRouter import DonationRouter
 from router.challengeRouter import ChallengeRouter
+from util.adVerifier import AdVerifier
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -44,7 +45,9 @@ coupon_repo: CouponRepository = CouponMongoRepo(db)
 donation_repo: DonationRepository = DonationMongoRepo(db)
 challenge_repo: ChallengeRepository = ChallengeMongoRepo(db)
 
-user_router = UserRouter(user_repo)
+ad_verifier: AdVerifier = AdVerifier()
+
+user_router = UserRouter(user_repo, ad_verifier)
 file_router = FileRouter(user_repo, file_repo)
 reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
 donation_router = DonationRouter(user_repo, donation_repo)
