@@ -10,14 +10,18 @@ import pymongo
 from dotenv import load_dotenv
 
 from middleware.authParser import AuthParser
-from core.repo import UserRepository, FileRepository, RewardRepository, CouponRepository
+from core.repo import UserRepository, FileRepository, RewardRepository, CouponRepository, DonationRepository, ChallengeRepository
 from repo.userMongo import UserMongoRepo
 from repo.fileMongo import FileMongoRepo
 from repo.rewardMongo import RewardMongoRepo
 from repo.couponMongo import CouponMongoRepo
+from repo.donationMongo import DonationMongoRepo
+from repo.challengeMongo import ChallengeMongoRepo
 from router.userRouter import UserRouter
 from router.fileRouter import FileRouter
 from router.tempRewardRouter import RewardRouter
+from router.donationRouter import DonationRouter
+from router.challengeRouter import ChallengeRouter
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -37,10 +41,14 @@ user_repo: UserRepository = UserMongoRepo(db)
 file_repo: FileRepository = FileMongoRepo(db)
 reward_repo: RewardRepository = RewardMongoRepo(db)
 coupon_repo: CouponRepository = CouponMongoRepo(db)
+donation_repo: DonationRepository = DonationMongoRepo(db)
+challenge_repo: ChallengeRepository = ChallengeMongoRepo(db)
 
 user_router = UserRouter(user_repo)
 file_router = FileRouter(user_repo, file_repo)
 reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
+donation_router = DonationRouter(user_repo, donation_repo)
+challenge_router = ChallengeRouter(user_repo, challenge_repo, file_repo)
 
 ########## FastAPI App ##########
 security = HTTPBearer()
@@ -71,5 +79,7 @@ app_router = APIRouter(prefix="/api")
 app_router.include_router(user_router, tags=["User"])
 app_router.include_router(file_router, tags=["File"])
 app_router.include_router(reward_router, tags=["Reward"])
+app_router.include_router(donation_router, tags=["Donation"])
+app_router.include_router(challenge_router, tags=["Challenge"])
 
 app.include_router(app_router)
