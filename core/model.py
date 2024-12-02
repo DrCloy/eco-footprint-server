@@ -43,6 +43,7 @@ class ChallengeItemMeta(BaseModel):
 
 
 class ChallengeRecordItem(BaseModel):
+    id: str
     userId: str
     imageId: str
     date: str
@@ -63,7 +64,6 @@ class UserItem(UserItemMeta):
     username: str
     point: int = Field(..., ge=0)
     couponList: list[CouponItemMeta] = []
-    challengeList: list[ChallengeItemMeta] = []
     thumbnailId: str = ''
 
 
