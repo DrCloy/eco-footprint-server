@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 
 from core.model import UserItem, DonationItem, DonationItemMeta
 from core.repo import UserRepository, DonationRepository
+from util.adVerifier import AdVerifier
 
 
 class DonationRouter(APIRouter):
@@ -11,10 +12,14 @@ class DonationRouter(APIRouter):
     This class is a router class for donation-related API endpoints.
     """
 
-    def __init__(self, userRepo: UserRepository, donationRepo: DonationRepository):
+    # Class Constants
+    DONATION_TOTAL_POINT = 100
+
+    def __init__(self, userRepo: UserRepository, donationRepo: DonationRepository, adVerifier: AdVerifier):
         super().__init__(prefix="/donation")
         self._userRepo = userRepo
         self._donationRepo = donationRepo
+        self._adVerifier = adVerifier
 
         self.add_api_route(path="/create", endpoint=self._createDonation, methods=["POST"])
         self.add_api_route(path="/all", endpoint=self._getAllDonations, methods=["GET"])
@@ -134,10 +139,17 @@ class DonationRouter(APIRouter):
         if userId in donation.participants:
             raise HTTPException(status_code=400, detail="Already participated in the donation")
 
-        # TODO: Check if the user has already watched an ad
-        # TODO: If the user has watched an ad, add points to the donation and the user
+        point = self._adVerifier.check_log(userId)
+        if point == -1:
+            raise HTTPException(status_code=400, detail="User has not watched an ad")
 
+        restPoint = max(0, self.DONATION_TOTAL_POINT - donation.points)
+
+        user.point += point
+        donation.totalPoint += restPoint
         donation.participants.append(userId)
+
+        self._userRepo.updateUser(user)
         donation = self._donationRepo.updateDonation(donation)
         return donation
 
