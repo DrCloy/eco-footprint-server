@@ -2,8 +2,8 @@ import os
 import json
 from jwcrypto import jwk, jwt, common
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
+from fastapi.security import HTTPBearer
 
 google_public_keys = [
     {
@@ -52,47 +52,32 @@ for key in kakao_public_keys:
     kakao_jwkset.add(jwk.JWK(**key))
 
 
-class AuthParser(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        # Add 'auth' to the request state
-        request.state.auth = None
+class AuthParser(HTTPBearer):
+    def __init__(self):
+        super().__init__()
 
-        # Get the Authorization header
-        auth_header = request.headers.get("Authorization")
+    async def __call__(self, request: Request):
+        try:
+            auth_header = request.headers.get("Authorization")
 
-        # Set request state auth to 'test' if the environment is 'test'
-        if os.getenv("ENV_MODE") == "test":
-            if auth_header:
+            if os.getenv("ENV_MODE") == "test":
                 request.state.auth = {
                     "sub": auth_header.split(" ")[1],
                 }
-            response = await call_next(request)
-            return response
+            else:
+                auth_type, auth_token = auth_header.split(" ")
+                if auth_type == "Bearer":
+                    payload_encoded = auth_token.split(".")[1]
+                    payload_byte = common.base64url_decode(payload_encoded)
+                    payload = json.loads(payload_byte)
 
-        if auth_header:
-            # Split the header into the type and token
-            auth_type, auth_token = auth_header.split(" ")
-            # Check if the type is Bearer
-            if auth_type == "Bearer":
-                # Get payload from the token
-                payload_encoded = auth_token.split(".")[1]
-                payload_byte = common.base64url_decode(payload_encoded)
-                payload = json.loads(payload_byte)
+                    if payload.get('iss') == "https://accounts.google.com" or payload["iss"] == "accounts.google.com":
+                        kid = payload["kid"]
+                        key = google_jwkset.get_key(kid)
+                    elif payload.get('iss') == "https://kauth.kakao.com":
+                        kid = payload["kid"]
+                        key = kakao_jwkset.get_key(kid)
 
-                # Check if the issuer is Google
-                if payload.get('iss') == "https://accounts.google.com" or payload["iss"] == "accounts.google.com":
-                    # Get the key id
-                    kid = payload["kid"]
-                    # Get the key from the key id
-                    key = google_jwkset.get_key(kid)
-                # Check if the issuer is Kakao
-                elif payload.get('iss') == "https://kauth.kakao.com":
-                    # Get the key id
-                    kid = payload["kid"]
-                    # Get the key from the key id
-                    key = kakao_jwkset.get_key(kid)
-                # Verify the token
-                try:
                     token = jwt.JWT(key=key, jwt=auth_token)
                     payload: dict = json.loads(token.claims)
 
@@ -104,11 +89,6 @@ class AuthParser(BaseHTTPMiddleware):
                             raise HTTPException(status_code=401, detail="Token invalid")
 
                     request.state.auth = payload
-                except jwt.JWTExpired:
-                    raise HTTPException(status_code=401, detail="Token expired")
-                except jwt.JWTClaimsSetValidationFailed:
-                    raise HTTPException(status_code=401, detail="Token invalid")
-        print(request.state.auth)
-        # Call the next middleware
-        response = await call_next(request)
-        return response
+
+        except Exception as e:
+            request.state.auth = None
