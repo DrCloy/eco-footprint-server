@@ -1,7 +1,7 @@
-from fastapi import UploadFile, HTTPException, Request, APIRouter, Response
+from fastapi import APIRouter, HTTPException, Request, Response, UploadFile
 
 from core.model import FileData
-from core.repo import UserRepository, FileRepository
+from core.repo import FileRepository, UserRepository
 
 
 class FileRouter(APIRouter):

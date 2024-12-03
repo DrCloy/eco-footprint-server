@@ -1,28 +1,29 @@
 # Import libraries and modules
+import os
 from typing import *
-from fastapi import FastAPI, responses, HTTPException, APIRouter, Depends
+
+import pymongo
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, responses
 from fastapi.middleware.cors import CORSMiddleware
 
-import os
-import pymongo
-
-from dotenv import load_dotenv
-
-from util.authParser import AuthParser
-from core.repo import UserRepository, FileRepository, RewardRepository, CouponRepository, DonationRepository, ChallengeRepository
-from repo.userMongo import UserMongoRepo
-from repo.fileMongo import FileMongoRepo
-from repo.rewardMongo import RewardMongoRepo
+from core.repo import (ChallengeRepository, CouponRepository,
+                       DonationRepository, FileRepository, RewardRepository,
+                       UserRepository)
+from repo.challengeMongo import ChallengeMongoRepo
 from repo.couponMongo import CouponMongoRepo
 from repo.donationMongo import DonationMongoRepo
-from repo.challengeMongo import ChallengeMongoRepo
-from router.userRouter import UserRouter
+from repo.fileMongo import FileMongoRepo
+from repo.rewardMongo import RewardMongoRepo
+from repo.userMongo import UserMongoRepo
+from router.adRouter import AdRouter
+from router.challengeRouter import ChallengeRouter
+from router.donationRouter import DonationRouter
 from router.fileRouter import FileRouter
 from router.tempRewardRouter import RewardRouter
-from router.donationRouter import DonationRouter
-from router.challengeRouter import ChallengeRouter
-from router.adRouter import AdRouter
+from router.userRouter import UserRouter
 from util.adVerifier import AdVerifier
+from util.authParser import AuthParser
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)

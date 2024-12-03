@@ -2,8 +2,10 @@ import datetime
 
 from fastapi import APIRouter, HTTPException, Request
 
-from core.model import RewardItem, RewardItemMeta, CouponItem, CouponItemMeta, FileData
-from core.repo import UserRepository, RewardRepository, CouponRepository, FileRepository
+from core.model import (CouponItem, CouponItemMeta, FileData, RewardItem,
+                        RewardItemMeta)
+from core.repo import (CouponRepository, FileRepository, RewardRepository,
+                       UserRepository)
 
 
 class RewardRouter(APIRouter):

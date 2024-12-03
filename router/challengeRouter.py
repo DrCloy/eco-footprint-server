@@ -1,9 +1,10 @@
 from datetime import datetime
-from bson import ObjectId
-from fastapi import APIRouter, Request, HTTPException
 
-from core.model import UserItemMeta, ChallengeItem, ChallengeRecordItem
-from core.repo import UserRepository, ChallengeRepository, FileRepository
+from bson import ObjectId
+from fastapi import APIRouter, HTTPException, Request
+
+from core.model import ChallengeItem, ChallengeRecordItem, UserItemMeta
+from core.repo import ChallengeRepository, FileRepository, UserRepository
 
 
 class ChallengeRouter(APIRouter):

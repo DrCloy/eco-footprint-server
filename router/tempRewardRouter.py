@@ -1,10 +1,11 @@
-import random
 import datetime
+import random
 
 from fastapi import APIRouter, HTTPException, Request
 
-from core.model import RewardItem, RewardItemMeta, CouponItem, CouponItemMeta
-from core.repo import UserRepository, RewardRepository, CouponRepository, FileRepository
+from core.model import CouponItem, CouponItemMeta, RewardItem, RewardItemMeta
+from core.repo import (CouponRepository, FileRepository, RewardRepository,
+                       UserRepository)
 
 coupon_bugger = ['6744a8355885bfc26714aa32', '6744a861d3331dac07b19577', '6744a86cd3331dac07b19579',
                  '6744a86cd3331dac07b19579', '6744a881d3331dac07b1957d', '6744a889d3331dac07b1957f', '6744a891d3331dac07b19581']

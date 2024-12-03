@@ -1,11 +1,12 @@
-import json
+import asyncio
 import base64
 import hashlib
+import json
 import time
-import asyncio
 import urllib.request
+
+from ecdsa.keys import BadSignatureError, VerifyingKey
 from ecdsa.util import sigdecode_der
-from ecdsa.keys import VerifyingKey, BadSignatureError
 
 
 class AdVerifier:

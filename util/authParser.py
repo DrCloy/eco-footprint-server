@@ -1,9 +1,9 @@
-import os
 import json
-from jwcrypto import jwk, jwt, common
+import os
 
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPBearer
+from jwcrypto import common, jwk, jwt
 
 google_public_keys = [
     {

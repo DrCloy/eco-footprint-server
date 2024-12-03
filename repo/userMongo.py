@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-
 from pymongo.database import Database
 
 from core.model import UserItem

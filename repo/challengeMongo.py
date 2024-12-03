@@ -1,10 +1,8 @@
 from bson import ObjectId
-
 from fastapi import HTTPException
-
 from pymongo.database import Database
 
-from core.model import ChallengeItemMeta, ChallengeItem
+from core.model import ChallengeItem, ChallengeItemMeta
 from core.repo import ChallengeRepository
 
 
