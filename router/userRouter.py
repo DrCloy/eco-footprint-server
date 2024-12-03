@@ -111,8 +111,6 @@ class UserRouter(APIRouter):
 
         if not user.couponList == userItem.couponList:
             raise HTTPException(status_code=400, detail="Bad Request")
-        if not user.challengeList == userItem.challengeList:
-            raise HTTPException(status_code=400, detail="Bad Request")
 
         user = self._userRepo.updateUser(userItem)
 
