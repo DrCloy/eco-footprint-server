@@ -1,12 +1,9 @@
-import os
-import io
-import base64
 import random
 import datetime
 
-from fastapi import APIRouter, HTTPException, Request, UploadFile
+from fastapi import APIRouter, HTTPException, Request
 
-from core.model import RewardItem, RewardItemMeta, CouponItem, CouponItemMeta, FileData
+from core.model import RewardItem, RewardItemMeta, CouponItem, CouponItemMeta
 from core.repo import UserRepository, RewardRepository, CouponRepository, FileRepository
 
 coupon_bugger = ['6744a8355885bfc26714aa32', '6744a861d3331dac07b19577', '6744a86cd3331dac07b19579',
