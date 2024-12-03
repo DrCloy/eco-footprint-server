@@ -2,7 +2,6 @@
 from typing import *
 from fastapi import FastAPI, responses, HTTPException, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
 
 import os
 import pymongo
