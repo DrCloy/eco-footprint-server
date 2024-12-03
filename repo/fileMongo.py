@@ -61,7 +61,8 @@ class FileMongoRepo(FileRepository):
                 isPrivate=uploadedFile["isPrivate"]
             )
         else:
-            raise HTTPException(status_code=500, detail="Failed to create file")
+            raise HTTPException(
+                status_code=500, detail="Failed to create file")
 
     def getFile(self, fileId: str) -> FileData:
         """
@@ -105,7 +106,8 @@ class FileMongoRepo(FileRepository):
         fileData.size = file.size
         fileData.file = base64.b64encode(file.file.read()).decode("utf-8")
 
-        self._collection.update_one({"id": fileData.id}, {"$set": fileData.model_dump()})
+        self._collection.update_one(
+            {"id": fileData.id}, {"$set": fileData.model_dump()})
 
         newFile = self._collection.find_one({"id": fileData.id})
 
@@ -119,7 +121,8 @@ class FileMongoRepo(FileRepository):
                 file=base64.b64decode(newFile["file"])
             )
         else:
-            raise HTTPException(status_code=500, detail="Failed to update file")
+            raise HTTPException(
+                status_code=500, detail="Failed to update file")
 
     def deleteFile(self, fileId: str) -> bool:
         """

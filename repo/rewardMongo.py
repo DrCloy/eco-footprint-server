@@ -40,7 +40,8 @@ class RewardMongoRepo(RewardRepository):
         if reward:
             return RewardItem(**reward)
         else:
-            raise HTTPException(status_code=500, detail="Failed to create reward")
+            raise HTTPException(
+                status_code=500, detail="Failed to create reward")
 
     def getAllRewards(self) -> list[RewardItemMeta]:
         """
@@ -81,13 +82,15 @@ class RewardMongoRepo(RewardRepository):
         Returns:
             RewardItem: Updated reward item
         """
-        self._collection.update_one({"id": rewardItem.id}, {"$set": rewardItem.model_dump()})
+        self._collection.update_one({"id": rewardItem.id}, {
+                                    "$set": rewardItem.model_dump()})
 
         reward = self._collection.find_one({"id": rewardItem.id})
         if rewardItem == reward:
             return RewardItem(**reward)
         else:
-            raise HTTPException(status_code=500, detail="Failed to update reward")
+            raise HTTPException(
+                status_code=500, detail="Failed to update reward")
 
     def deleteReward(self, rewardId: str) -> bool:
         """

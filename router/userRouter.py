@@ -17,11 +17,16 @@ class UserRouter(APIRouter):
         self._userRepo = userRepo
         self._adVerifier = adVerifier
 
-        self.add_api_route(path="/register", endpoint=self._register, methods=["POST"])
-        self.add_api_route(path="/profile/{userId}", endpoint=self._getProfile, methods=["GET"])
-        self.add_api_route(path="/profile", endpoint=self._updateProfile, methods=["PUT"])
-        self.add_api_route(path='/point', endpoint=self._addPoint, methods=["POST"])
-        self.add_api_route(path="/delete/{userId}", endpoint=self._deleteUser, methods=["DELETE"])
+        self.add_api_route(
+            path="/register", endpoint=self._register, methods=["POST"])
+        self.add_api_route(
+            path="/profile/{userId}", endpoint=self._getProfile, methods=["GET"])
+        self.add_api_route(
+            path="/profile", endpoint=self._updateProfile, methods=["PUT"])
+        self.add_api_route(
+            path='/point', endpoint=self._addPoint, methods=["POST"])
+        self.add_api_route(
+            path="/delete/{userId}", endpoint=self._deleteUser, methods=["DELETE"])
 
     def _register(self, userItem: UserItem, request: Request) -> UserItem:
         """
@@ -131,7 +136,8 @@ class UserRouter(APIRouter):
         if ad:
             point = self._adVerifier.check_log(userId)
             if point == -1:
-                raise HTTPException(status_code=400, detail="No point available")
+                raise HTTPException(
+                    status_code=400, detail="No point available")
             user.point += point
             await self._adVerifier.delete_log(userId)
             user = self._userRepo.updateUser(user)

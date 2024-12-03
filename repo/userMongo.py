@@ -37,7 +37,8 @@ class UserMongoRepo(UserRepository):
         if user:
             return UserItem(**user)
         else:
-            raise HTTPException(status_code=500, detail="Failed to create user")
+            raise HTTPException(
+                status_code=500, detail="Failed to create user")
 
     def getUser(self, userId: str) -> UserItem:
         """
@@ -68,14 +69,16 @@ class UserMongoRepo(UserRepository):
         Returns:
             UserItem: UserItem object
         """
-        self._collection.update_one({"id": userItem.id}, {"$set": userItem.model_dump()})
+        self._collection.update_one(
+            {"id": userItem.id}, {"$set": userItem.model_dump()})
 
         user = self._collection.find_one({"id": userItem.id})
         newUser = UserItem(**user)
         if newUser == userItem:
             return newUser
         else:
-            raise HTTPException(status_code=500, detail="Failed to update user")
+            raise HTTPException(
+                status_code=500, detail="Failed to update user")
 
     def deleteUser(self, userId: str) -> bool:
         """

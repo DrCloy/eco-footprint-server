@@ -35,7 +35,8 @@ MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 MONGO_DB = os.getenv("MONGO_DB")
 
 ########## MongoDB Connection ##########
-client = pymongo.MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASSWORD)
+client = pymongo.MongoClient(host=MONGO_HOST, port=int(
+    MONGO_PORT), username=MONGO_USER, password=MONGO_PASSWORD)
 db = client[MONGO_DB]
 
 ########## Dependency Injection ##########
@@ -51,13 +52,14 @@ ad_verifier: AdVerifier = AdVerifier()
 user_router = UserRouter(user_repo, ad_verifier)
 file_router = FileRouter(user_repo, file_repo)
 reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
-donation_router = DonationRouter(user_repo, donation_repo)
+donation_router = DonationRouter(user_repo, donation_repo, ad_verifier)
 challenge_router = ChallengeRouter(user_repo, challenge_repo, file_repo)
 ad_router = AdRouter(user_repo, ad_verifier)
 
 ########## FastAPI App ##########
 security = AuthParser()
-app = FastAPI(title="Eco-Footprint API", version="0.1", dependencies=[Depends(security)], docs_url="/balloon/docs")
+app = FastAPI(title="Eco-Footprint API", version="0.1",
+              dependencies=[Depends(security)], docs_url="/balloon/docs")
 
 app.add_middleware(
     CORSMiddleware,

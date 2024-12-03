@@ -44,10 +44,12 @@ class AdVerifier:
 
         key = self.admob_key[key_id]
         vk = VerifyingKey.from_pem(key['pem'])
-        signature = base64.urlsafe_b64decode(signature + '=' * (4 - len(signature) % 4))
+        signature = base64.urlsafe_b64decode(
+            signature + '=' * (4 - len(signature) % 4))
         message = message.encode("utf-8")
         try:
-            vk.verify(signature, message, hashfunc=hashlib.sha256, sigdecode=sigdecode_der)
+            vk.verify(signature, message, hashfunc=hashlib.sha256,
+                      sigdecode=sigdecode_der)
             return True
         except BadSignatureError:
             return False
@@ -70,7 +72,8 @@ class AdVerifier:
     async def delete_log(self, user_id: str):
         try:
             async with self.lock:
-                self.ad_verify_log = [log for log in self.ad_verify_log if log['user_id'] != user_id]
+                self.ad_verify_log = [
+                    log for log in self.ad_verify_log if log['user_id'] != user_id]
             return True
         except Exception:
             return False

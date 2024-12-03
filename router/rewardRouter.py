@@ -23,14 +23,22 @@ class RewardRouter(APIRouter):
         self._couponRepo = couponRepo
         self._fileRepo = fileRepo
 
-        self.add_api_route(methods=["POST"], path="/create", endpoint=self.createReward)
-        self.add_api_route(methods=["GET"], path="/all", endpoint=self.getAllRewards)
-        self.add_api_route(methods=["GET"], path="/{rewardId}", endpoint=self.getReward)
-        self.add_api_route(methods=["PUT"], path="/update", endpoint=self.updateReward)
-        self.add_api_route(methods=["DELETE"], path="/delete/{rewardId}", endpoint=self.deleteReward)
-        self.add_api_route(methods=["POST"], path="/purchase/{rewardId}", endpoint=self.purchaseReward)
-        self.add_api_route(methods=["POST"], path="/extend/{couponId}", endpoint=self.extendExpiration)
-        self.add_api_route(methods=["DELETE"], path="/delete/{couponId}", endpoint=self.deleteCoupon)
+        self.add_api_route(
+            methods=["POST"], path="/create", endpoint=self.createReward)
+        self.add_api_route(methods=["GET"], path="/all",
+                           endpoint=self.getAllRewards)
+        self.add_api_route(
+            methods=["GET"], path="/{rewardId}", endpoint=self.getReward)
+        self.add_api_route(
+            methods=["PUT"], path="/update", endpoint=self.updateReward)
+        self.add_api_route(
+            methods=["DELETE"], path="/delete/{rewardId}", endpoint=self.deleteReward)
+        self.add_api_route(
+            methods=["POST"], path="/purchase/{rewardId}", endpoint=self.purchaseReward)
+        self.add_api_route(
+            methods=["POST"], path="/extend/{couponId}", endpoint=self.extendExpiration)
+        self.add_api_route(
+            methods=["DELETE"], path="/delete/{couponId}", endpoint=self.deleteCoupon)
 
     def createReward(self, rewardItem: RewardItem, request: Request) -> RewardItem:
         """
@@ -165,7 +173,8 @@ class RewardRouter(APIRouter):
             description=reward.description,
             thumbnailId=reward.thumbnailId,
             couponId=couponId,
-            expiredAt=str(int((datetime.datetime.now() + datetime.timedelta(days=7)).timestamp()))
+            expiredAt=str(
+                int((datetime.datetime.now() + datetime.timedelta(days=7)).timestamp()))
         )
         coupon = self._couponRepo.createCoupon(coupon)
         user.couponList.append(CouponItemMeta(**coupon))
@@ -197,7 +206,8 @@ class RewardRouter(APIRouter):
         if not next((coupon for coupon in user.couponList if coupon.couponId == couponId), None):
             raise HTTPException(status_code=400, detail="Coupon not found")
         coupon = self._couponRepo.getCoupon(couponId)
-        coupon.expiredAt = str(int((datetime.datetime.fromtimestamp(int(coupon.expiredAt)) + datetime.timedelta(days=7)).timestamp()))
+        coupon.expiredAt = str(int((datetime.datetime.fromtimestamp(
+            int(coupon.expiredAt)) + datetime.timedelta(days=7)).timestamp()))
         coupon = self._couponRepo.updateCoupon(coupon)
 
         return coupon

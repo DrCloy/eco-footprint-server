@@ -40,7 +40,8 @@ class CouponMongoRepo(CouponRepository):
         if coupon:
             return CouponItem(**coupon)
         else:
-            raise HTTPException(status_code=500, detail="Failed to create coupon")
+            raise HTTPException(
+                status_code=500, detail="Failed to create coupon")
 
     def getCoupon(self, couponId: str) -> CouponItem:
         """
@@ -71,13 +72,15 @@ class CouponMongoRepo(CouponRepository):
         Returns:
             CouponItem: Updated coupon item
         """
-        self._collection.update_one({"id": couponItem.id}, {"$set": couponItem.model_dump()})
+        self._collection.update_one({"id": couponItem.id}, {
+                                    "$set": couponItem.model_dump()})
 
         coupon = self._collection.find_one({"id": couponItem.id})
         if couponItem == coupon:
             return CouponItem(**coupon)
         else:
-            raise HTTPException(status_code=500, detail="Failed to update coupon")
+            raise HTTPException(
+                status_code=500, detail="Failed to update coupon")
 
     def deleteCoupon(self, couponId: str) -> bool:
         """

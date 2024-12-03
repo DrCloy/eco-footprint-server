@@ -18,8 +18,10 @@ class FileRouter(APIRouter):
 
         self.add_api_route('/create', self._createFile, methods=['POST'])
         self.add_api_route('/{fileId}', self._getFile, methods=['GET'])
-        self.add_api_route('/update/{fileId}', self._updateFile, methods=['PUT'])
-        self.add_api_route('/delete/{fileId}', self._deleteFile, methods=['DELETE'])
+        self.add_api_route('/update/{fileId}',
+                           self._updateFile, methods=['PUT'])
+        self.add_api_route('/delete/{fileId}',
+                           self._deleteFile, methods=['DELETE'])
 
     def _createFile(self, file: UploadFile, request: Request, isPrivate: bool = False) -> FileData:
         """

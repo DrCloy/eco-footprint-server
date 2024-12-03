@@ -10,7 +10,8 @@ class AdRouter(APIRouter):
         self._userRepo = userRepo
         self._adVerifier = adVerifier
 
-        self.add_api_route(path="/verify", endpoint=self._verifySSV, methods=["POST"])
+        self.add_api_route(
+            path="/verify", endpoint=self._verifySSV, methods=["POST"])
 
     async def _verifySSV(self, request: Request) -> bool:
         """
@@ -30,7 +31,8 @@ class AdRouter(APIRouter):
         if not self._userRepo.getUser(userId):
             raise HTTPException(status_code=404, detail="User not found")
 
-        message = "&".join([f"{k}={v}" for k, v in sorted(query_params.items(), key=lambda x: x[0]) if k not in ["key_id", "signature"]])
+        message = "&".join([f"{k}={v}" for k, v in sorted(
+            query_params.items(), key=lambda x: x[0]) if k not in ["key_id", "signature"]])
 
         if not self._adVerifier.verify_admob_ssv(message, key_id, signature):
             raise HTTPException(status_code=401, detail="Unauthorized")

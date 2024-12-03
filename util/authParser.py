@@ -83,10 +83,12 @@ class AuthParser(HTTPBearer):
 
                     if payload.get("iss") == "https://accounts.google.com" or payload.get("iss") == "accounts.google.com":
                         if payload.get("aud") != os.getenv("GOOGLE_CLIENT_ID"):
-                            raise HTTPException(status_code=401, detail="Token invalid")
+                            raise HTTPException(
+                                status_code=401, detail="Token invalid")
                     elif payload.get("iss") == "https://kauth.kakao.com":
                         if payload.get("aud") != os.getenv("KAKAO_CLIENT_ID"):
-                            raise HTTPException(status_code=401, detail="Token invalid")
+                            raise HTTPException(
+                                status_code=401, detail="Token invalid")
 
                     request.state.auth = payload
 

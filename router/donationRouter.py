@@ -21,12 +21,18 @@ class DonationRouter(APIRouter):
         self._donationRepo = donationRepo
         self._adVerifier = adVerifier
 
-        self.add_api_route(path="/create", endpoint=self._createDonation, methods=["POST"])
-        self.add_api_route(path="/all", endpoint=self._getAllDonations, methods=["GET"])
-        self.add_api_route(path="/{donationId}", endpoint=self._getDonation, methods=["GET"])
-        self.add_api_route(path="/{donationId}/update", endpoint=self._updateDonation, methods=["PUT"])
-        self.add_api_route(path="/{donationId}/participate/{userId}", endpoint=self._participateDonation, methods=["POST"])
-        self.add_api_route(path="/{donationId}/delete", endpoint=self._deleteDonation, methods=["DELETE"])
+        self.add_api_route(
+            path="/create", endpoint=self._createDonation, methods=["POST"])
+        self.add_api_route(
+            path="/all", endpoint=self._getAllDonations, methods=["GET"])
+        self.add_api_route(path="/{donationId}",
+                           endpoint=self._getDonation, methods=["GET"])
+        self.add_api_route(path="/{donationId}/update",
+                           endpoint=self._updateDonation, methods=["PUT"])
+        self.add_api_route(path="/{donationId}/participate/{userId}",
+                           endpoint=self._participateDonation, methods=["POST"])
+        self.add_api_route(
+            path="/{donationId}/delete", endpoint=self._deleteDonation, methods=["DELETE"])
 
     def _createDonation(self, donationItem: DonationItem, request: Request) -> DonationItem:
         """
@@ -137,11 +143,13 @@ class DonationRouter(APIRouter):
             raise HTTPException(status_code=404, detail="Donation not found")
 
         if userId in donation.participants:
-            raise HTTPException(status_code=400, detail="Already participated in the donation")
+            raise HTTPException(
+                status_code=400, detail="Already participated in the donation")
 
         point = self._adVerifier.check_log(userId)
         if point == -1:
-            raise HTTPException(status_code=400, detail="User has not watched an ad")
+            raise HTTPException(
+                status_code=400, detail="User has not watched an ad")
 
         restPoint = max(0, self.DONATION_TOTAL_POINT - donation.points)
 

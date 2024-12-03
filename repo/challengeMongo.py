@@ -40,7 +40,8 @@ class ChallengeMongoRepo(ChallengeRepository):
         if challenge:
             return ChallengeItem(**challenge)
         else:
-            raise HTTPException(status_code=500, detail="Failed to create challenge")
+            raise HTTPException(
+                status_code=500, detail="Failed to create challenge")
 
     def getAllChallenges(self) -> list[ChallengeItemMeta]:
         """
@@ -81,13 +82,15 @@ class ChallengeMongoRepo(ChallengeRepository):
         Returns:
             ChallengeItem: Updated ChallengeItem object
         """
-        self._collection.update_one({"id": challengeItem.id}, {"$set": challengeItem.model_dump()})
+        self._collection.update_one({"id": challengeItem.id}, {
+                                    "$set": challengeItem.model_dump()})
 
         challenge = self._collection.find_one({"id": challengeItem.id})
         if challengeItem == challenge:
             return ChallengeItem(**challenge)
         else:
-            raise HTTPException(status_code=500, detail="Failed to update challenge")
+            raise HTTPException(
+                status_code=500, detail="Failed to update challenge")
 
     def deleteChallenge(self, challengeId: str) -> bool:
         """

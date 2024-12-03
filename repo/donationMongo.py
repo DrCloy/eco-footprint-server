@@ -36,7 +36,8 @@ class DonationMongoRepo(DonationRepository):
         if donation:
             return DonationItem(**donation)
         else:
-            raise HTTPException(status_code=500, detail="Failed to create donation")
+            raise HTTPException(
+                status_code=500, detail="Failed to create donation")
 
     def getAllDonations(self) -> list[DonationItemMeta]:
         """
@@ -77,13 +78,15 @@ class DonationMongoRepo(DonationRepository):
         Returns:
             DonationItem: The updated donation item
         """
-        self._collection.update_one({"id": donationItem.id}, {"$set": donationItem.model_dump()})
+        self._collection.update_one({"id": donationItem.id}, {
+                                    "$set": donationItem.model_dump()})
 
         donation = self._collection.find_one({"id": donationItem.id})
         if donationItem == donation:
             return DonationItem(**donation)
         else:
-            raise HTTPException(status_code=500, detail="Failed to update donation")
+            raise HTTPException(
+                status_code=500, detail="Failed to update donation")
 
     def deleteDonation(self, donationId: str) -> bool:
         """

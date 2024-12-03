@@ -24,12 +24,18 @@ class ChallengeRouter(APIRouter):
         self._challengeRepo = challengeRepo
         self._fileRepo = fileRepo
 
-        self.add_api_route(path="/create", endpoint=self._createChallenge, methods=["POST"])
-        self.add_api_route(path="/all", endpoint=self._getAllChallenges, methods=["GET"])
-        self.add_api_route(path="/{challengeId}", endpoint=self._getChallenge, methods=["GET"])
-        self.add_api_route(path="/{challengeId}/participate", endpoint=self._participateChallenge, methods=["POST"])
-        self.add_api_route(path="/{challengeId}/add/{imageId}", endpoint=self._addChallengeRecord, methods=["POST"])
-        self.add_api_route(path="/{challengeId}/record/{recordId}/approve", endpoint=self._changeRecordState, methods=["PUT"])
+        self.add_api_route(
+            path="/create", endpoint=self._createChallenge, methods=["POST"])
+        self.add_api_route(
+            path="/all", endpoint=self._getAllChallenges, methods=["GET"])
+        self.add_api_route(path="/{challengeId}",
+                           endpoint=self._getChallenge, methods=["GET"])
+        self.add_api_route(path="/{challengeId}/participate",
+                           endpoint=self._participateChallenge, methods=["POST"])
+        self.add_api_route(path="/{challengeId}/add/{imageId}",
+                           endpoint=self._addChallengeRecord, methods=["POST"])
+        self.add_api_route(path="/{challengeId}/record/{recordId}/approve",
+                           endpoint=self._changeRecordState, methods=["PUT"])
 
     def _createChallenge(self, challengeItem: ChallengeItem, request: Request) -> ChallengeItem:
         """
@@ -57,11 +63,13 @@ class ChallengeRouter(APIRouter):
             raise HTTPException(status_code=404, detail="User not found")
 
         if user.point < self.CHALLENGE_PARTICIPATE_POINT:
-            raise HTTPException(status_code=400, detail="Not enough point to create the challenge")
+            raise HTTPException(
+                status_code=400, detail="Not enough point to create the challenge")
         user.point -= self.CHALLENGE_PARTICIPATE_POINT
         self._userRepo.updateUser(user)
 
-        challengeItem.participants = UserItemMeta(id=userId, username=user.username, thumbnailId=user.thumbnailId)
+        challengeItem.participants = UserItemMeta(
+            id=userId, username=user.username, thumbnailId=user.thumbnailId)
         challengeItem.currentParticipants = 1
         challengeItem = self._challengeRepo.createChallenge(challengeItem)
 
@@ -128,14 +136,17 @@ class ChallengeRouter(APIRouter):
             raise HTTPException(status_code=404, detail="Challenge not found")
 
         if userId in challenge.participants:
-            raise HTTPException(status_code=400, detail="Already participated in the challenge")
+            raise HTTPException(
+                status_code=400, detail="Already participated in the challenge")
 
         if user.point < self.CHALLENGE_PARTICIPATE_POINT:
-            raise HTTPException(status_code=400, detail="Not enough point to participate in the challenge")
+            raise HTTPException(
+                status_code=400, detail="Not enough point to participate in the challenge")
         user.point -= self.CHALLENGE_PARTICIPATE_POINT
 
         challenge.currentParticipants += 1
-        challenge.participants.append(UserItemMeta(id=userId, username=user.username, thumbnailId=user.thumbnailId))
+        challenge.participants.append(UserItemMeta(
+            id=userId, username=user.username, thumbnailId=user.thumbnailId))
         self._userRepo.updateUser(user)
         self._challengeRepo.updateChallenge(challenge)
 
@@ -176,7 +187,8 @@ class ChallengeRouter(APIRouter):
         if file is None:
             raise HTTPException(status_code=404, detail="Image not found")
 
-        challengeRecord = ChallengeRecordItem(id=str(ObjectId()), userId=userId, imageId=imageId, date=str(datetime.now()))
+        challengeRecord = ChallengeRecordItem(
+            id=str(ObjectId()), userId=userId, imageId=imageId, date=str(datetime.now()))
         challenge.records.append(challengeRecord)
         challenge = self._challengeRepo.updateChallenge(challenge)
 
@@ -216,7 +228,8 @@ class ChallengeRouter(APIRouter):
         if userId not in challenge.participants:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        record = next((record for record in challenge.records if record.id == recordId), None)
+        record = next(
+            (record for record in challenge.records if record.id == recordId), None)
         if record is None:
             raise HTTPException(status_code=404, detail="Record not found")
 
