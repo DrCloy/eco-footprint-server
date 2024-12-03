@@ -1,5 +1,3 @@
-import os
-import random
 import datetime
 
 from fastapi import APIRouter, HTTPException, Request
