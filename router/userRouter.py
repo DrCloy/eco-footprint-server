@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 
 from core.model import UserItem
 from core.repo import UserRepository
+from util.adVerifier import AdVerifier
 
 
 class UserRouter(APIRouter):
@@ -11,13 +12,15 @@ class UserRouter(APIRouter):
     This class is a router class for user-related API endpoints.
     """
 
-    def __init__(self, userRepo: UserRepository):
+    def __init__(self, userRepo: UserRepository, adVerifier: AdVerifier):
         super().__init__(prefix="/user")
         self._userRepo = userRepo
+        self._adVerifier = adVerifier
 
         self.add_api_route(path="/register", endpoint=self._register, methods=["POST"])
         self.add_api_route(path="/profile/{userId}", endpoint=self._getProfile, methods=["GET"])
         self.add_api_route(path="/profile", endpoint=self._updateProfile, methods=["PUT"])
+        self.add_api_route(path='/point', endpoint=self._addPoint, methods=["POST"])
         self.add_api_route(path="/delete/{userId}", endpoint=self._deleteUser, methods=["DELETE"])
 
     def _register(self, userItem: UserItem, request: Request) -> UserItem:
@@ -110,13 +113,36 @@ class UserRouter(APIRouter):
 
         return user
 
-    # TODO: Implement the following methods
-    def _addPoint(self, request: Request) -> UserItem:
+    async def _addPoint(self, request: Request, ad: bool = False) -> UserItem:
         """
-        Add point to the user
+        Add point to the user when the user touched the flag in the map.
         This route is callback route for Google AdMob reward video ad.
         """
-        pass
+        if request.state.auth is None:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if not request.state.auth.get("sub"):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        userId = request.state.auth["sub"]
+        user = self._userRepo.getUser(userId)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if ad:
+            point = self._adVerifier.check_log(userId)
+            if point == 0:
+                raise HTTPException(status_code=400, detail="No point available")
+            user.point += point
+            await self._adVerifier.delete_log(userId)
+            user = self._userRepo.updateUser(user)
+
+            return user
+        else:
+            # TODO: Check if the user is available to get point
+
+            user.point += 1
+            user = self._userRepo.updateUser(user)
+            return user
 
     def _deleteUser(self, userId: str, request: Request) -> bool:
         """
