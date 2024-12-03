@@ -9,7 +9,7 @@ import pymongo
 
 from dotenv import load_dotenv
 
-from middleware.authParser import AuthParser
+from util.authParser import AuthParser
 from core.repo import UserRepository, FileRepository, RewardRepository, CouponRepository, DonationRepository, ChallengeRepository
 from repo.userMongo import UserMongoRepo
 from repo.fileMongo import FileMongoRepo
@@ -22,6 +22,7 @@ from router.fileRouter import FileRouter
 from router.tempRewardRouter import RewardRouter
 from router.donationRouter import DonationRouter
 from router.challengeRouter import ChallengeRouter
+from router.adRouter import AdRouter
 from util.adVerifier import AdVerifier
 
 # Load environment variables
@@ -52,9 +53,10 @@ file_router = FileRouter(user_repo, file_repo)
 reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
 donation_router = DonationRouter(user_repo, donation_repo)
 challenge_router = ChallengeRouter(user_repo, challenge_repo, file_repo)
+ad_router = AdRouter(user_repo, ad_verifier)
 
 ########## FastAPI App ##########
-security = HTTPBearer()
+security = AuthParser()
 app = FastAPI(title="Eco-Footprint API", version="0.1", dependencies=[Depends(security)], docs_url="/balloon/docs")
 
 app.add_middleware(
@@ -64,7 +66,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(AuthParser)
 
 ########## Error Handlers ##########
 
@@ -84,5 +85,6 @@ app_router.include_router(file_router, tags=["File"])
 app_router.include_router(reward_router, tags=["Reward"])
 app_router.include_router(donation_router, tags=["Donation"])
 app_router.include_router(challenge_router, tags=["Challenge"])
+app_router.include_router(ad_router, tags=["Ad"])
 
 app.include_router(app_router)
