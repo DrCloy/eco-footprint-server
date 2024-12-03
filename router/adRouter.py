@@ -13,6 +13,10 @@ class AdRouter(APIRouter):
         self.add_api_route(path="/verify", endpoint=self._verifySSV, methods=["POST"])
 
     async def _verifySSV(self, request: Request) -> bool:
+        """
+        Verify the AdMob SSV
+        This is a route for Google Admob Server-Side Verification (SSV) callback.
+        """
         query_params = request.query_params
         key_id = query_params.get("key_id")
         signature = query_params.get("signature")
