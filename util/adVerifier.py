@@ -64,7 +64,7 @@ class AdVerifier:
             if log['user_id'] == user_id:
                 if time.time() - (int(log['timestamp']) / 1000) < 60 * 5:
                     return int(log['reward_amount'])
-        return 0
+        return -1
 
     async def delete_log(self, user_id: str):
         try:

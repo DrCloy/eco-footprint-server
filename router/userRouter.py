@@ -130,7 +130,7 @@ class UserRouter(APIRouter):
 
         if ad:
             point = self._adVerifier.check_log(userId)
-            if point == 0:
+            if point == -1:
                 raise HTTPException(status_code=400, detail="No point available")
             user.point += point
             await self._adVerifier.delete_log(userId)
