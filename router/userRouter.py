@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Request
 from core.model import UserItem
 from core.repo import UserRepository
 from util.adVerifier import AdVerifier
+from util.signVerifier import verifySignature
 
 
 class UserRouter(APIRouter):
@@ -11,6 +12,8 @@ class UserRouter(APIRouter):
 
     This class is a router class for user-related API endpoints.
     """
+
+    # Class Constants
 
     def __init__(self, userRepo: UserRepository, adVerifier: AdVerifier):
         super().__init__(prefix="/user")
@@ -116,9 +119,9 @@ class UserRouter(APIRouter):
 
         return user
 
-    async def _addPoint(self, request: Request, ad: bool = False) -> UserItem:
+    async def _addPoint(self, request: Request, point: int, itemId: str, signature: str) -> UserItem:
         """
-        Add point to the user when the user touched the flag in the map.
+        Add point to the user when the user touched the flag in the map and didn't watch the ad.
         This route is callback route for Google AdMob reward video ad.
         """
         if request.state.auth is None:
@@ -131,22 +134,15 @@ class UserRouter(APIRouter):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        if ad:
-            point = self._adVerifier.check_log(userId)
-            if point == -1:
-                raise HTTPException(
-                    status_code=400, detail="No point available")
-            user.point += point
-            await self._adVerifier.delete_log(userId)
-            user = self._userRepo.updateUser(user)
+        # TODO: Verify the signature
+        message = userId + "_" + itemId
+        if not verifySignature(message, "secret", signature):
+            raise HTTPException(status_code=400, detail="Bad Request")
 
-            return user
-        else:
-            # TODO: Check if the user is available to get point
+        user.point += point
+        user = self._userRepo.updateUser(user)
 
-            user.point += 1
-            user = self._userRepo.updateUser(user)
-            return user
+        return user
 
     def _deleteUser(self, userId: str, request: Request) -> bool:
         """
