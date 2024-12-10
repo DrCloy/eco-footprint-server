@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 
-from core.model import DonationItem, DonationItemMeta, UserItem
+from core.model import DonationItem, DonationItemMeta, UserItem, ItemState
 from core.repo import DonationRepository, UserRepository
 from util.adVerifier import AdVerifier
 
@@ -55,8 +55,9 @@ class DonationRouter(APIRouter):
         userId = request.state.auth["sub"]
         # TODO: Check if the user is admin
 
-        donationItem.id = self._donationRepo.createDonation(donationItem)
-        return donationItem
+        donationItem.state = ItemState.ACTIVE
+        donation = self._donationRepo.createDonation(donationItem)
+        return donation
 
     def _getAllDonations(self):
         """
@@ -118,7 +119,7 @@ class DonationRouter(APIRouter):
         self._donationRepo.updateDonation(donationItem)
         return donationItem
 
-    def _participateDonation(self, userId: str, donationId: str, request: Request) -> DonationItem:
+    def _participateDonation(self, userId: str, donationId: str, rewardPoint: int, request: Request) -> DonationItem:
         """
         Participate in the donation with donationId
 
@@ -142,18 +143,14 @@ class DonationRouter(APIRouter):
         if donation is None:
             raise HTTPException(status_code=404, detail="Donation not found")
 
-        if userId in donation.participants:
-            raise HTTPException(
-                status_code=400, detail="Already participated in the donation")
-
         point = self._adVerifier.check_log(userId)
         if point == -1:
             raise HTTPException(
                 status_code=400, detail="User has not watched an ad")
 
-        restPoint = max(0, self.DONATION_TOTAL_POINT - donation.points)
+        restPoint = max(0, point - rewardPoint)
 
-        user.point += point
+        user.point += rewardPoint
         donation.totalPoint += restPoint
         donation.participants.append(userId)
 

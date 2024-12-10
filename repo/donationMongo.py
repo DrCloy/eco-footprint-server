@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 from fastapi import HTTPException
 
 from core.model import DonationItem, DonationItemMeta
@@ -30,6 +32,7 @@ class DonationMongoRepo(DonationRepository):
         Returns:
             DonationItem: The created donation item
         """
+        donationItem.id = str(ObjectId())
         self._collection.insert_one(donationItem.model_dump())
 
         donation = self._collection.find_one({"id": donationItem.id})
