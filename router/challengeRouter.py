@@ -1,6 +1,6 @@
+import math
 from datetime import datetime
 
-from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
 
 from core.model import ChallengeItem, ChallengeRecordItem, UserItemMeta
@@ -15,8 +15,9 @@ class ChallengeRouter(APIRouter):
     """
 
     # Class constarnts
-    CHALLENGE_PARTICIPATE_POINT = 50
-    CHALLENGE_REWARD_ADDITIONAL_POINT = 100
+    CHALLENGE_PARTICIPATE_POINT = 500
+    CHALLENGE_REWARD_BASE_POINT = CHALLENGE_PARTICIPATE_POINT + 100
+    CHALLENGE_REWARD_ADDITIONAL_POINT = 2000
 
     def __init__(self, userRepo: UserRepository, challengeRepo: ChallengeRepository, fileRepo: FileRepository):
         super().__init__(prefix="/challenge")
@@ -134,6 +135,12 @@ class ChallengeRouter(APIRouter):
         challenge = self._challengeRepo.getChallenge(challengeId)
         if challenge is None:
             raise HTTPException(status_code=404, detail="Challenge not found")
+        if challenge.currentParticipants >= challenge.totalParticipants:
+            raise HTTPException(
+                status_code=400, detail="Challenge is already full")
+        if not challenge.state == "ACTIVE":
+            raise HTTPException(
+                status_code=400, detail="Challenge is not active")
 
         if userId in challenge.participants:
             raise HTTPException(
@@ -187,8 +194,9 @@ class ChallengeRouter(APIRouter):
         if file is None:
             raise HTTPException(status_code=404, detail="Image not found")
 
+        recordId = str(0 if not challenge.participantRecords else int(challenge.participantRecords[-1].id) + 1)
         challengeRecord = ChallengeRecordItem(
-            id=str(ObjectId()), userId=userId, imageId=imageId, date=str(datetime.now()))
+            id=str(recordId), userId=userId, imageId=imageId, date=str(datetime.now()))
         challenge.records.append(challengeRecord)
         challenge = self._challengeRepo.updateChallenge(challenge)
 
@@ -235,5 +243,56 @@ class ChallengeRouter(APIRouter):
 
         record.approved = approve
         challenge = self._challengeRepo.updateChallenge(challenge)
+
+        return challenge
+
+    def getChallengePoint(self, challengeId: str, userId: str, request: Request) -> ChallengeItem:
+        """
+        Get the challenge point with challengeId and userId
+
+        Args:
+            challengeId (str): The challengeId to get the point
+            userId (str): The userId to get the point
+            request (Request): The request object
+
+        Raises:
+            HTTPException(status_code=401): If the user is not authenticated
+            HTTPException(status_code=404): If the user is not found
+            HTTPException(status_code=404): If the challenge is not found
+
+        Returns:
+            ChallengeItem: The challenge with the point
+        """
+        if request.state.auth is None:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if request.state.auth["sub"] is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user = self._userRepo.getUser(userId)
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        challenge = self._challengeRepo.getChallenge(challengeId)
+        if challenge is None:
+            raise HTTPException(status_code=404, detail="Challenge not found")
+        if not challenge.state == "FINISHED":
+            raise HTTPException(
+                status_code=400, detail="Challenge is not finished yet")
+
+        if userId not in challenge.participants:
+            raise HTTPException(
+                status_code=400, detail="User did not participate in the challenge")
+
+        totalPoint = self.CHALLENGE_REWARD_BASE_POINT
+        userRecordCount = len(
+            [record for record in challenge.records if record.userId == userId])
+        totalPoint += math.floor(self.CHALLENGE_REWARD_ADDITIONAL_POINT * (userRecordCount / len(challenge.records)))
+
+        user.point += totalPoint
+        self._userRepo.updateUser(user)
+
+        challenge.currentParticipants -= 1
+        if challenge.currentParticipants == 0:
+            challenge.state = "INACTIVE"
 
         return challenge
