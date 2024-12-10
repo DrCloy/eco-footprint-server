@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import IntEnum
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
-class ItemState(Enum):
+class ItemState(IntEnum):
     UNDEFINED = -1
     PENDING = 0
     ACTIVE = 1
@@ -68,13 +68,12 @@ class UserItem(UserItemMeta):
     thumbnailId: str = ''
 
 
-class DonationItem(DonationItemMeta):
+class DonationItem(DonationItemMeta, use_enum_values=True):
     id: str
     name: str
     currentPoint: int = Field(..., ge=0)
     totalPoint: int = Field(..., ge=0)
     description: str
-    participants: list[str] = []
     thumbnailId: Optional[str] = None
     state: ItemState = ItemState.UNDEFINED
 
