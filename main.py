@@ -6,6 +6,7 @@ import pymongo
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, responses
 from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.repo import (ChallengeRepository, CouponRepository,
                        DonationRepository, FileRepository, RewardRepository,
@@ -24,6 +25,7 @@ from router.tempRewardRouter import RewardRouter
 from router.userRouter import UserRouter
 from util.adVerifier import AdVerifier
 from util.authParser import AuthParser
+from util.schedule import check_ad_log, check_challenge_expiry
 
 # Load environment variables
 load_dotenv(verbose=True, dotenv_path=".env.development", override=True)
@@ -56,10 +58,26 @@ donation_router = DonationRouter(user_repo, donation_repo, ad_verifier)
 challenge_router = ChallengeRouter(user_repo, challenge_repo, file_repo)
 ad_router = AdRouter(user_repo, ad_verifier)
 
+########## Scheduler ##########
+scheduler = BackgroundScheduler()
+
+scheduler.add_job(check_ad_log, "interval", minutes=1)
+scheduler.add_job(check_challenge_expiry, "cron", hour=0, minute=0)
+
+
+async def lifespan(app: FastAPI):
+    scheduler.start()
+    print("Scheduler started")
+
+    yield
+
+    print("Scheduler shutting down")
+    scheduler.shutdown()
+
 ########## FastAPI App ##########
 security = AuthParser()
 app = FastAPI(title="Eco-Footprint API", version="0.1",
-              dependencies=[Depends(security)], docs_url="/balloon/docs")
+              dependencies=[Depends(security)], docs_url="/balloon/docs", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
