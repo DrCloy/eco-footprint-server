@@ -93,10 +93,8 @@ class ChallengeItem(ChallengeItemMeta):
     name: str
     totalParticipants: int = Field(..., ge=0)
     currentParticipants: int
-    createdAt: str
     participants: list[UserItemMeta] = []
     participantRecords: list[ChallengeRecordItem] = []
-    dateStart: str
     dateEnd: str
     description: str
     state: ItemState = ItemState.UNDEFINED
