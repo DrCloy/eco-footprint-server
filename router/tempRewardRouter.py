@@ -192,7 +192,7 @@ class RewardRouter(APIRouter):
             )
             coupon = self._couponRepo.createCoupon(coupon)
 
-            user.couponList.append(CouponItemMeta(**coupon.dict()))
+            user.couponList.append(CouponItemMeta(**coupon.model_dump()))
             user.point -= reward.price
             user = self._userRepo.updateUser(user)
 
@@ -227,7 +227,7 @@ class RewardRouter(APIRouter):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        if not next((coupon for coupon in user.couponList if coupon.couponId == couponId), None):
+        if not next((coupon for coupon in user.couponList if coupon.id == couponId), None):
             raise HTTPException(status_code=400, detail="Coupon not found")
 
         coupon = self._couponRepo.getCoupon(couponId)
@@ -263,7 +263,7 @@ class RewardRouter(APIRouter):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        if not next((coupon for coupon in user.couponList if coupon.couponId == couponId), None):
+        if not next((coupon for coupon in user.couponList if coupon.id == couponId), None):
             raise HTTPException(status_code=400, detail="Coupon not found")
 
         return self._couponRepo.deleteCoupon(couponId)
