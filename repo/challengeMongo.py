@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 from pymongo.database import Database
 
-from core.model import ChallengeItem, ChallengeItemMeta
+from core.model import ChallengeItem, ChallengeItemMeta, ItemState
 from core.repo import ChallengeRepository
 
 
@@ -33,6 +33,7 @@ class ChallengeMongoRepo(ChallengeRepository):
             ChallengeItem: Created ChallengeItem object
         """
         challengeItem.id = str(ObjectId())
+        challengeItem.state = ItemState.ACTIVE
         self._collection.insert_one(challengeItem.model_dump())
 
         challenge = self._collection.find_one({"id": challengeItem.id})
