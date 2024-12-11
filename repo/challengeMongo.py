@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 from pymongo.database import Database
 
-from core.model import ChallengeItem, ChallengeItemMeta, ItemState
+from core.model import ChallengeItem, ChallengeItemMeta, ItemState, UserItemMeta
 from core.repo import ChallengeRepository
 
 
@@ -64,8 +64,9 @@ class ChallengeMongoRepo(ChallengeRepository):
             ChallengeItem: ChallengeItem object if found, None otherwise
         """
         challenge = self._collection.find_one({"id": challengeId})
+        participants = [UserItemMeta(**participant) for participant in challenge.pop("participants")]
         if challenge:
-            return ChallengeItem(**challenge)
+            return ChallengeItem(participants=participants, **challenge)
         else:
             return None
 
