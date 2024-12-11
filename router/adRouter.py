@@ -11,13 +11,14 @@ class AdRouter(APIRouter):
         self._adVerifier = adVerifier
 
         self.add_api_route(
-            path="/verify", endpoint=self._verifySSV, methods=["POST"])
+            path="/verify", endpoint=self._verifySSV, methods=["POST", "GET"])
 
-    async def _verifySSV(self, request: Request) -> bool:
+    async def _verifySSV(self, request: Request) -> dict:
         """
         Verify the AdMob SSV
         This is a route for Google Admob Server-Side Verification (SSV) callback.
         """
+        # TODO: Add reverse DNS from Google
         query_params = request.query_params
         key_id = query_params.get("key_id")
         signature = query_params.get("signature")

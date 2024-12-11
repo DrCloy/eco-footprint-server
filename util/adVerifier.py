@@ -33,7 +33,7 @@ class AdVerifier:
             return
 
         for key in keys['keys']:
-            self.admob_key[key['keyId']] = dict(
+            self.admob_key[str(key['keyId'])] = dict(
                 pem=key['pem'],
                 base64=key['base64']
             )
@@ -66,6 +66,8 @@ class AdVerifier:
         for log in self.ad_verify_log:
             if log['user_id'] == user_id:
                 if time.time() - (int(log['timestamp']) / 1000) < 60 * 5:
+                    # TODO: Delete checked log
+
                     return int(log['reward_amount'])
         return -1
 

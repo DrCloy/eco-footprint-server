@@ -69,8 +69,8 @@ class ChallengeRouter(APIRouter):
         user.point -= self.CHALLENGE_PARTICIPATE_POINT
         self._userRepo.updateUser(user)
 
-        challengeItem.participants = UserItemMeta(
-            id=userId, username=user.username, thumbnailId=user.thumbnailId)
+        challengeItem.participants = [UserItemMeta(
+            id=userId, username=user.username, thumbnailId=user.thumbnailId)]
         challengeItem.currentParticipants = 1
         challengeItem = self._challengeRepo.createChallenge(challengeItem)
 
