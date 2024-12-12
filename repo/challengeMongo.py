@@ -64,7 +64,10 @@ class ChallengeMongoRepo(ChallengeRepository):
             ChallengeItem: ChallengeItem object if found, None otherwise
         """
         challenge = self._collection.find_one({"id": challengeId})
-        participants = [UserItemMeta(**participant) for participant in challenge.pop("participants")]
+
+        if not challenge:
+            raise HTTPException(status_code=404, detail="Challenge not found")
+        participants = [UserItemMeta(**participant) for participant in challenge.get("participants")]
         if challenge:
             return ChallengeItem(participants=participants, **challenge)
         else:
