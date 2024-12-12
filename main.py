@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, responses
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
 from core.repo import (ChallengeRepository, CouponRepository,
                        DonationRepository, FileRepository, RewardRepository,
@@ -61,8 +63,8 @@ ad_router = AdRouter(user_repo, ad_verifier)
 ########## Scheduler ##########
 scheduler = BackgroundScheduler()
 
-scheduler.add_job(check_ad_log, "interval", minutes=1)
-scheduler.add_job(check_challenge_expiry, "cron", hour=0, minute=0)
+scheduler.add_job(lambda: check_ad_log(ad_verifier), IntervalTrigger(minutes=1))
+scheduler.add_job(lambda: check_challenge_expiry(challenge_repo), CronTrigger(hour=0, minute=0))
 
 
 async def lifespan(app: FastAPI):
