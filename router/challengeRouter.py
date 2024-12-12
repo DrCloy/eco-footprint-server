@@ -3,7 +3,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Request
 
-from core.model import ChallengeItem, ChallengeRecordItem, UserItemMeta
+from core.model import ChallengeItem, ChallengeRecordItem, UserItemMeta, ItemState
 from core.repo import ChallengeRepository, FileRepository, UserRepository
 
 
@@ -138,7 +138,7 @@ class ChallengeRouter(APIRouter):
         if challenge.currentParticipants >= challenge.totalParticipants:
             raise HTTPException(
                 status_code=400, detail="Challenge is already full")
-        if not challenge.state == "ACTIVE":
+        if not challenge.state == ItemState.ACTIVE:
             raise HTTPException(
                 status_code=400, detail="Challenge is not active")
 
@@ -275,7 +275,7 @@ class ChallengeRouter(APIRouter):
         challenge = self._challengeRepo.getChallenge(challengeId)
         if challenge is None:
             raise HTTPException(status_code=404, detail="Challenge not found")
-        if not challenge.state == "FINISHED":
+        if not challenge.state == ItemState.FINISHED:
             raise HTTPException(
                 status_code=400, detail="Challenge is not finished yet")
 
@@ -293,6 +293,6 @@ class ChallengeRouter(APIRouter):
 
         challenge.currentParticipants -= 1
         if challenge.currentParticipants == 0:
-            challenge.state = "INACTIVE"
+            challenge.state = ItemState.INACTIVE
 
         return challenge
