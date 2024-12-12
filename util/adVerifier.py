@@ -62,20 +62,24 @@ class AdVerifier:
         except Exception:
             return False
 
-    def check_log(self, user_id: str):
-        for log in self.ad_verify_log:
-            if log['user_id'] == user_id:
+    async def check_log(self, user_id: str):
+        for i in range(len(self.ad_verify_log)):
+            if self.ad_verify_log[i].get("user_id") == user_id:
+                log = self.ad_verify_log[i]
                 if time.time() - (int(log['timestamp']) / 1000) < 60 * 5:
                     # TODO: Delete checked log
-
-                    return int(log['reward_amount'])
+                    try:
+                        async with self.lock:
+                            self.ad_verify_log.pop(i)
+                        return int(log['reward_amount'])
+                    except Exception:
+                        return -1
         return -1
 
-    async def delete_log(self, user_id: str):
+    async def remove_old_log(self):
         try:
             async with self.lock:
-                self.ad_verify_log = [
-                    log for log in self.ad_verify_log if log['user_id'] != user_id]
+                self.ad_verify_log = [log for log in self.ad_verify_log if time.time() - (int(log['timestamp']) / 1000) < 60 * 5]
             return True
         except Exception:
             return False

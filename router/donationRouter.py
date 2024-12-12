@@ -119,7 +119,7 @@ class DonationRouter(APIRouter):
         self._donationRepo.updateDonation(donationItem)
         return donationItem
 
-    def _participateDonation(self, userId: str, donationId: str, rewardPoint: int, request: Request) -> DonationItem:
+    async def _participateDonation(self, userId: str, donationId: str, rewardPoint: int, request: Request) -> DonationItem:
         """
         Participate in the donation with donationId
 
@@ -143,7 +143,7 @@ class DonationRouter(APIRouter):
         if donation is None:
             raise HTTPException(status_code=404, detail="Donation not found")
 
-        point = self._adVerifier.check_log(userId)
+        point = await self._adVerifier.check_log(userId)
         if point == -1:
             raise HTTPException(
                 status_code=400, detail="User has not watched an ad")
