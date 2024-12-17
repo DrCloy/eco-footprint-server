@@ -76,9 +76,9 @@ class AdVerifier:
                         return -1
         return -1
 
-    async def remove_old_log(self):
+    def remove_old_log(self):
         try:
-            async with self.lock:
+            with self.lock:
                 self.ad_verify_log = [log for log in self.ad_verify_log if time.time() - (int(log['timestamp']) / 1000) < 60 * 5]
             return True
         except Exception:

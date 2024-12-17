@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 
-from core.model import DonationItem, DonationItemMeta, UserItem, ItemState
+from core.model import DonationItem, ItemState
 from core.repo import DonationRepository, UserRepository
 from util.adVerifier import AdVerifier
 
@@ -15,11 +15,12 @@ class DonationRouter(APIRouter):
     # Class Constants
     DONATION_TOTAL_POINT = 100
 
-    def __init__(self, userRepo: UserRepository, donationRepo: DonationRepository, adVerifier: AdVerifier):
+    def __init__(self, userRepo: UserRepository, donationRepo: DonationRepository, adVerifier: AdVerifier, adminId: list[str]):
         super().__init__(prefix="/donation")
         self._userRepo = userRepo
         self._donationRepo = donationRepo
         self._adVerifier = adVerifier
+        self._adminId = adminId
 
         self.add_api_route(
             path="/create", endpoint=self._createDonation, methods=["POST"])
@@ -53,7 +54,8 @@ class DonationRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth["sub"]
-        # TODO: Check if the user is admin
+        if not userId in self._adminId:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         donationItem.state = ItemState.ACTIVE
         donation = self._donationRepo.createDonation(donationItem)
@@ -109,7 +111,8 @@ class DonationRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth["sub"]
-        # TODO: Check if the user is admin
+        if not userId in self._adminId:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         donation = self._donationRepo.getDonation(donationId)
         if donation is None:
@@ -179,7 +182,8 @@ class DonationRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth["sub"]
-        # TODO: Check if the user is admin
+        if not userId in self._adminId:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         donation = self._donationRepo.getDonation(donationId)
         if donation is None:

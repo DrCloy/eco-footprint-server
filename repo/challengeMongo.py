@@ -68,6 +68,7 @@ class ChallengeMongoRepo(ChallengeRepository):
         if not challenge:
             raise HTTPException(status_code=404, detail="Challenge not found")
         participants = [UserItemMeta(**participant) for participant in challenge.get("participants")]
+        challenge.pop("participants")
         if challenge:
             return ChallengeItem(participants=participants, **challenge)
         else:
@@ -90,8 +91,9 @@ class ChallengeMongoRepo(ChallengeRepository):
                                     "$set": challengeItem.model_dump()})
 
         challenge = self._collection.find_one({"id": challengeItem.id})
+        challenge = ChallengeItem(**challenge)
         if challengeItem == challenge:
-            return ChallengeItem(**challenge)
+            return challenge
         else:
             raise HTTPException(
                 status_code=500, detail="Failed to update challenge")

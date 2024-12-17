@@ -38,7 +38,6 @@ class AdRouter(APIRouter):
         if not self._adVerifier.verify_admob_ssv(message, key_id, signature):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        # TODO: Add log
         log = dict(
             user_id=query_params.get("user_id"),
             reward_amount=query_params.get("reward_amount"),

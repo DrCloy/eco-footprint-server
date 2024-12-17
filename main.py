@@ -1,5 +1,6 @@
 # Import libraries and modules
 import os
+import logging
 from typing import *
 
 import pymongo
@@ -38,6 +39,8 @@ MONGO_USER = os.getenv("MONGO_USER")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 MONGO_DB = os.getenv("MONGO_DB")
 
+ADMIN_ID = os.getenv("ADMIN_ID").split(",")
+
 ########## MongoDB Connection ##########
 client = pymongo.MongoClient(host=MONGO_HOST, port=int(
     MONGO_PORT), username=MONGO_USER, password=MONGO_PASSWORD)
@@ -55,8 +58,8 @@ ad_verifier: AdVerifier = AdVerifier()
 
 user_router = UserRouter(user_repo, ad_verifier)
 file_router = FileRouter(user_repo, file_repo)
-reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo)
-donation_router = DonationRouter(user_repo, donation_repo, ad_verifier)
+reward_router = RewardRouter(user_repo, reward_repo, coupon_repo, file_repo, ADMIN_ID)
+donation_router = DonationRouter(user_repo, donation_repo, ad_verifier, ADMIN_ID)
 challenge_router = ChallengeRouter(user_repo, challenge_repo, file_repo)
 ad_router = AdRouter(user_repo, ad_verifier)
 
@@ -64,16 +67,19 @@ ad_router = AdRouter(user_repo, ad_verifier)
 scheduler = BackgroundScheduler()
 
 scheduler.add_job(lambda: check_ad_log(ad_verifier), IntervalTrigger(minutes=1))
-scheduler.add_job(lambda: check_challenge_expiry(challenge_repo), CronTrigger(hour=0, minute=0))
+scheduler.add_job(lambda: check_challenge_expiry(challenge_repo), CronTrigger(hour=0, minute=0, timezone="Asia/Seoul"))
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 async def lifespan(app: FastAPI):
     scheduler.start()
-    print("Scheduler started")
+    logger.info("Scheduler started")
 
     yield
 
-    print("Scheduler shutting down")
+    logger.info("Scheduler shutdown")
     scheduler.shutdown()
 
 ########## FastAPI App ##########

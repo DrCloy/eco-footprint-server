@@ -37,6 +37,7 @@ class ChallengeRouter(APIRouter):
                            endpoint=self._addChallengeRecord, methods=["POST"])
         self.add_api_route(path="/{challengeId}/record/{recordId}/approve",
                            endpoint=self._changeRecordState, methods=["PUT"])
+        self.add_api_route(path="/{challengeId}/clear", endpoint=self._getChallengePoint, methods=["GET"])
 
     def _createChallenge(self, challengeItem: ChallengeItem, request: Request) -> ChallengeItem:
         """
@@ -190,6 +191,14 @@ class ChallengeRouter(APIRouter):
         if challenge is None:
             raise HTTPException(status_code=404, detail="Challenge not found")
 
+        isParticipant = False
+        for participant in challenge.participants:
+            if participant.id == userId:
+                isParticipant = True
+                break
+        if not isParticipant:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
         file = self._fileRepo.getFile(imageId)
         if file is None:
             raise HTTPException(status_code=404, detail="Image not found")
@@ -197,7 +206,7 @@ class ChallengeRouter(APIRouter):
         recordId = str(0 if not challenge.participantRecords else int(challenge.participantRecords[-1].id) + 1)
         challengeRecord = ChallengeRecordItem(
             id=str(recordId), userId=userId, imageId=imageId, date=str(datetime.now()))
-        challenge.records.append(challengeRecord)
+        challenge.participantRecords.append(challengeRecord)
         challenge = self._challengeRepo.updateChallenge(challenge)
 
         return challenge
@@ -233,11 +242,16 @@ class ChallengeRouter(APIRouter):
         challenge = self._challengeRepo.getChallenge(challengeId)
         if challenge is None:
             raise HTTPException(status_code=404, detail="Challenge not found")
-        if userId not in challenge.participants:
+        isParticipant = False
+        for participant in challenge.participants:
+            if participant.id == userId:
+                isParticipant = True
+                break
+        if not isParticipant:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         record = next(
-            (record for record in challenge.records if record.id == recordId), None)
+            (record for record in challenge.participantRecords if record.id == recordId), None)
         if record is None:
             raise HTTPException(status_code=404, detail="Record not found")
 
@@ -246,7 +260,7 @@ class ChallengeRouter(APIRouter):
 
         return challenge
 
-    def getChallengePoint(self, challengeId: str, userId: str, request: Request) -> ChallengeItem:
+    def _getChallengePoint(self, challengeId: str, userId: str, request: Request) -> ChallengeItem:
         """
         Get the challenge point with challengeId and userId
 
@@ -279,14 +293,17 @@ class ChallengeRouter(APIRouter):
             raise HTTPException(
                 status_code=400, detail="Challenge is not finished yet")
 
-        if userId not in challenge.participants:
-            raise HTTPException(
-                status_code=400, detail="User did not participate in the challenge")
+        isParticipant = False
+        for participant in challenge.participants:
+            if participant.id == userId:
+                isParticipant = True
+                break
+        if not isParticipant:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
         totalPoint = self.CHALLENGE_REWARD_BASE_POINT
-        userRecordCount = len(
-            [record for record in challenge.records if record.userId == userId])
-        totalPoint += math.floor(self.CHALLENGE_REWARD_ADDITIONAL_POINT * (userRecordCount / len(challenge.records)))
+        userRecordCount = len(list(filter(lambda record: record.userId == userId, challenge.participantRecords)))
+        totalPoint += math.floor(self.CHALLENGE_REWARD_ADDITIONAL_POINT * (userRecordCount / len(challenge.participantRecords)))
 
         user.point += totalPoint
         self._userRepo.updateUser(user)

@@ -16,12 +16,13 @@ class RewardRouter(APIRouter):
     This class will be exchanged when gift coupon API is available.
     """
 
-    def __init__(self, userRepo: UserRepository, rewardRepo: RewardRepository, couponRepo: CouponRepository, fileRepo: FileRepository):
+    def __init__(self, userRepo: UserRepository, rewardRepo: RewardRepository, couponRepo: CouponRepository, fileRepo: FileRepository, adminId: list[str]):
         super().__init__(prefix="/reward")
         self._userRepo = userRepo
         self._rewardRepo = rewardRepo
         self._couponRepo = couponRepo
         self._fileRepo = fileRepo
+        self._adminId = adminId
 
         self.add_api_route(
             methods=["POST"], path="/create", endpoint=self.createReward)
@@ -60,7 +61,8 @@ class RewardRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth.get("sub")
-        # TODO: Check if the user is an admin
+        if not userId in self._adminId:
+            raise HTTPException(status_code=403, detail="Forbidden")
 
         reward = self._rewardRepo.createReward(rewardItem)
         return reward
@@ -84,7 +86,10 @@ class RewardRouter(APIRouter):
         Returns:
             RewardItem: The rewardItem
         """
-        return self._rewardRepo.getReward(rewardId)
+        reward = self._rewardRepo.getReward(rewardId)
+        if not reward:
+            raise HTTPException(status_code=404, detail="Reward not found")
+        return reward
 
     def updateReward(self, rewardItem: RewardItem, request: Request) -> RewardItem:
         """
@@ -107,9 +112,8 @@ class RewardRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth.get("sub")
-        user = self._userRepo.getUser(userId)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        if not userId in self._adminId:
+            raise HTTPException(status_code=403, detail="Forbidden")
 
         reward = self._rewardRepo.updateReward(rewardItem)
         return reward
@@ -134,9 +138,8 @@ class RewardRouter(APIRouter):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
         userId = request.state.auth.get("sub")
-        user = self._userRepo.getUser(userId)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        if not userId in self._adminId:
+            raise HTTPException(status_code=403, detail="Forbidden")
 
         return self._rewardRepo.deleteReward(rewardId)
 
